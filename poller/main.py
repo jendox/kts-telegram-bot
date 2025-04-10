@@ -2,7 +2,7 @@ import asyncio
 import logging
 from logging import getLogger
 
-from poller.poller import TelegramPoller
+from poller import TelegramPoller
 
 logger = getLogger(__name__)
 

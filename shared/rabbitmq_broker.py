@@ -6,6 +6,8 @@ from typing import Any
 
 import aio_pika
 
+from shared.decorators import retry_async
+
 LOGGER_NAME = "rabbitmq"
 DEFAULT_URL = "amqp://guest:guest@127.0.0.1/"
 DEFAULT_QUEUE_NAME = "telegram"
@@ -21,6 +23,7 @@ class RabbitMQBroker:
         self.channel: aio_pika.Channel | None = None
         self.queue: aio_pika.Queue | None = None
 
+    @retry_async()
     async def start(self) -> None:
         """Создает соединение, канал и декларирует очередь"""
         try:
@@ -28,10 +31,10 @@ class RabbitMQBroker:
                 self.connection = await aio_pika.connect_robust(url=self.url)
                 self.logger.info("RabbitMQ connection successfully established")
             if not self.channel:
-                self.channel = self.connection.channel()
+                self.channel = await self.connection.channel()
                 self.logger.info("RabbitMQ channel successfully created")
             if not self.queue:
-                self.queue = self.channel.declare_queue(self.queue_name, durable=True)
+                self.queue = await self.channel.declare_queue(self.queue_name, durable=True)
                 self.logger.info("RabbitMQ queue declared successfully")
         except aio_pika.exceptions.AMQPConnectionError as e:
             self.logger.error("RabbitMQ connection error: %s", str(e))

@@ -10,7 +10,7 @@ from shared.client.telegram import TelegramClient
 from shared.rabbitmq_broker import RabbitMQBroker
 
 LOGGER_NAME = "telegram_poller"
-POLL_TIMEOUT = 2
+POLL_TIMEOUT = 10
 
 
 class TelegramPoller:

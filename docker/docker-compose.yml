@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # AMQP protocol port
+      - "15672:15672"  # HTTP management UI port
+    volumes:
+      - ../_storage/rabbitmq_data:/var/lib/rabbitmq
+      - ../_storage/rabbitmq_log:/var/log/rabbitmq
+    networks:
+      - bot-net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  poller:
+    image: poller-image
+    build:
+      context: ../poller
+      dockerfile: ../docker/Dockerfile.poller
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - bot-net
+    env_file:
+      - ../docker/env/tgclient.env
+      - ../docker/env/broker_docker.env
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_log:
+
+networks:
+  bot-net:
+    driver: bridge

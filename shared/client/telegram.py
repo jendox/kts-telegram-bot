@@ -8,9 +8,6 @@ from aiohttp import ClientSession
 from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnauthorized, HTTPForbidden, HTTPConflict, \
     HTTPInternalServerError
 
-from shared.client.schemes import RequestedUpdateSchema
-from shared.client.types import RequestedUpdate
-
 API_URL = "https://api.telegram.org/"
 
 REQUEST_MAX_TRIES = 5
@@ -53,7 +50,7 @@ class TelegramClient:
             kwargs: параметры
         """
         url = f"/bot{self.token}/{route}"
-        self.logger.info("Making request to %s with params: %s", kwargs, url)
+        self.logger.debug("Making request to %s with params: %s", kwargs, url)
         for tries_count in range(REQUEST_MAX_TRIES):
             async with self.session.post(url, **kwargs) as response:
                 data = await response.json()
