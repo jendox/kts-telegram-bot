@@ -3,6 +3,7 @@ import logging
 from logging import getLogger
 
 from poller import TelegramPoller
+from shared.config import load_config
 
 logger = getLogger(__name__)
 
@@ -19,7 +20,8 @@ async def main():
     poller = None
 
     try:
-        poller = TelegramPoller()
+        config = load_config("shared/config/config.yaml")
+        poller = TelegramPoller(config.broker.type)
         await poller.start()
         await poller.waiting_for_shutdown()
     except Exception as e:

@@ -6,8 +6,8 @@ from typing import Any
 
 from aiohttp.web_exceptions import HTTPConflict, HTTPUnauthorized
 
+from shared.broker import MessageBroker, get_broker, BrokerType
 from shared.client.telegram import TelegramClient
-from shared.rabbitmq_broker import RabbitMQBroker
 
 LOGGER_NAME = "telegram_poller"
 POLL_TIMEOUT = 10
@@ -16,10 +16,11 @@ __all__ = ("TelegramPoller",)
 
 
 class TelegramPoller:
-    def __init__(self):
+    def __init__(self, broker_type: BrokerType):
         self.logger = getLogger(LOGGER_NAME)
+        self.broker_type = broker_type
         self.client: TelegramClient | None = None
-        self.broker: RabbitMQBroker | None = None
+        self.broker: MessageBroker | None = None
         self.poll_task: Task | None = None
         self.is_running: bool = False
         self._shutdown_event: asyncio.Event | None = None
@@ -29,7 +30,7 @@ class TelegramPoller:
 
     async def start(self) -> None:
         """Создает брокер сообщений и клиента телеграм и запускает поллер"""
-        self.broker = RabbitMQBroker()
+        self.broker = get_broker(self.broker_type)
         await self.broker.start()
         self.client = TelegramClient()
         await self.client.start()

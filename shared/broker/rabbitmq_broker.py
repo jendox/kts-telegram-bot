@@ -6,7 +6,10 @@ from typing import Any
 
 import aio_pika
 
+from shared.broker import MessageBroker
 from shared.decorators import retry_async
+
+__all__ = ("RabbitMQBroker",)
 
 LOGGER_NAME = "rabbitmq"
 DEFAULT_URL = "amqp://guest:guest@127.0.0.1/"
@@ -14,7 +17,7 @@ DEFAULT_QUEUE_NAME = "telegram"
 MESSAGE_ENCODING = "utf-8"
 
 
-class RabbitMQBroker:
+class RabbitMQBroker(MessageBroker):
     def __init__(self):
         self.logger = getLogger(LOGGER_NAME)
         self.url = os.getenv("RABBITMQ_URL", default=DEFAULT_URL)
@@ -76,7 +79,7 @@ class RabbitMQBroker:
         except Exception as e:
             self.logger.error("Unexpected error publishing message: %s", str(e))
 
-    async def consume(self, callback: Callable[[str], Any]) -> None:
+    async def consume(self, callback: Callable[[Any], Any]) -> None:
         """Читает сообщение из очереди
         Args:
             callback: функция для обработки принятого сообщения

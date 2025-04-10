@@ -1,0 +1,2 @@
+broker:
+  type: rabbitmq
