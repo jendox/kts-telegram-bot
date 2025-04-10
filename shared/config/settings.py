@@ -25,10 +25,4 @@ def load_config(config_path: str) -> Config:
     with open(config_path, "r") as file:
         data = safe_load(file)
 
-        config = Config(
-            BrokerConfig(
-                type=BrokerType(data["broker"]["type"])
-            )
-        )
-
-        return config
+        return Config(BrokerConfig(type=BrokerType(data["broker"]["type"])))

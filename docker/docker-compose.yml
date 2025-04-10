@@ -1,6 +1,21 @@
 version: "3"
 
 services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=course_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./_storage/postgres_data:/var/lib/postgresql/data
+    networks:
+      - bot-net
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -13,10 +28,11 @@ services:
     networks:
       - bot-net
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
+      test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
   poller:
     image: poller-image
     build:
@@ -34,6 +50,7 @@ services:
 volumes:
   rabbitmq_data:
   rabbitmq_log:
+  postgres_data:
 
 networks:
   bot-net:

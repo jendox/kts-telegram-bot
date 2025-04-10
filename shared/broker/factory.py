@@ -16,5 +16,5 @@ class BrokerType(enum.Enum):
 def get_broker(broker_type: BrokerType) -> MessageBroker:
     if broker_type == BrokerType.RabbitMQ:
         return RabbitMQBroker()
-    else:
-        raise ValueError(f"Unsupported broker type: {broker_type.value}")
+
+    raise ValueError(f"Unsupported broker type: {broker_type.value}")

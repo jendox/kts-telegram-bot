@@ -28,9 +28,7 @@ class RabbitMQBroker(MessageBroker):
         self.channel: aio_pika.Channel | None = None
         self.queue: aio_pika.Queue | None = None
 
-    @retry_async(
-        allowed_exceptions=(aio_pika.exceptions.AMQPConnectionError,)
-    )
+    @retry_async(allowed_exceptions=(aio_pika.exceptions.AMQPConnectionError,))
     async def start(self) -> None:
         """Создает соединение, канал и декларирует очередь"""
         try:

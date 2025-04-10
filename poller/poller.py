@@ -6,7 +6,7 @@ from typing import Any
 
 from aiohttp.web_exceptions import HTTPConflict, HTTPUnauthorized
 
-from shared.broker import MessageBroker, get_broker, BrokerType
+from shared.broker import BrokerType, MessageBroker, get_broker
 from shared.client.telegram import TelegramClient
 
 LOGGER_NAME = "telegram_poller"

@@ -4,10 +4,10 @@ import logging
 
 
 def retry_async(
-        retries: int = 5,
-        delay: float = 2.0,
-        allowed_exceptions: tuple = (Exception,),
-        logger: logging.Logger | None = None,
+    retries: int = 5,
+    delay: float = 2.0,
+    allowed_exceptions: tuple = (Exception,),
+    logger: logging.Logger | None = None,
 ):
     """Декоратор для повторной попытки асинхронной функции в случае исключения.
 
