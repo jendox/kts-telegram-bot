@@ -7,13 +7,15 @@ def retry_async(
         retries: int = 5,
         delay: float = 2.0,
         allowed_exceptions: tuple = (Exception,),
-        logger: logging.Logger = None
+        logger: logging.Logger | None = None,
 ):
     """Декоратор для повторной попытки асинхронной функции в случае исключения.
-    :param retries: Количество попыток
-    :param delay: Задержка между попытками в секундах
-    :param allowed_exceptions: Исключения, при которых делать retry
-    :param logger: Логгер (по умолчанию используется logging.getLogger)
+
+    Args:
+        retries: количество попыток
+        delay: задержка между попытками в секундах
+        allowed_exceptions: исключения, при которых делать retry
+        logger: логгер (по умолчанию используется logging.getLogger)
     """
 
     def decorator(func):
@@ -25,12 +27,20 @@ def retry_async(
                     return await func(*args, **kwargs)
                 except allowed_exceptions as e:
                     _logger.warning(
-                        f"Attempt {attempt}/{retries} failed for {func.__name__}: {e}"
+                        "Attempt %s/%s failed for %s: %s",
+                        attempt,
+                        retries,
+                        func.__name__,
+                        e,
                     )
                     if attempt == retries:
-                        _logger.error(f"Function {func.__name__} failed after {retries} attempts.")
+                        _logger.error(
+                            "Function %s failed after %s attempts.",
+                            func.__name__,
+                            retries,
+                        )
                         raise
-                    await asyncio.sleep(delay)
+                    await asyncio.sleep(delay * attempt)
 
         return wrapper
 

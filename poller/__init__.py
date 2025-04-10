@@ -1,1 +1,1 @@
-from .poller import TelegramPoller
+from .poller import *

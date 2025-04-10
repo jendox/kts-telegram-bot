@@ -18,12 +18,16 @@ class RabbitMQBroker:
     def __init__(self):
         self.logger = getLogger(LOGGER_NAME)
         self.url = os.getenv("RABBITMQ_URL", default=DEFAULT_URL)
-        self.queue_name = os.getenv("RABBITMQ_QUEUE_NAME", default=DEFAULT_QUEUE_NAME)
+        self.queue_name = os.getenv(
+            "RABBITMQ_QUEUE_NAME", default=DEFAULT_QUEUE_NAME
+        )
         self.connection: aio_pika.Connection | None = None
         self.channel: aio_pika.Channel | None = None
         self.queue: aio_pika.Queue | None = None
 
-    @retry_async()
+    @retry_async(
+        allowed_exceptions=(aio_pika.exceptions.AMQPConnectionError,)
+    )
     async def start(self) -> None:
         """Создает соединение, канал и декларирует очередь"""
         try:
@@ -34,11 +38,10 @@ class RabbitMQBroker:
                 self.channel = await self.connection.channel()
                 self.logger.info("RabbitMQ channel successfully created")
             if not self.queue:
-                self.queue = await self.channel.declare_queue(self.queue_name, durable=True)
+                self.queue = await self.channel.declare_queue(
+                    self.queue_name, durable=True
+                )
                 self.logger.info("RabbitMQ queue declared successfully")
-        except aio_pika.exceptions.AMQPConnectionError as e:
-            self.logger.error("RabbitMQ connection error: %s", str(e))
-            raise
         except Exception as e:
             self.logger.error("Unexpected starting RabbitMQ error: %s", str(e))
             raise
@@ -64,10 +67,12 @@ class RabbitMQBroker:
                 routing_key=self.queue_name,
                 message=aio_pika.Message(
                     body=message.encode(MESSAGE_ENCODING),
-                    delivery_mode=aio_pika.DeliveryMode.PERSISTENT
-                )
+                    delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
+                ),
             )
-            self.logger.info("Message successfully published\nMessage: %s", message)
+            self.logger.info(
+                "Message successfully published\nMessage: %s", message
+            )
         except Exception as e:
             self.logger.error("Unexpected error publishing message: %s", str(e))
 
@@ -89,5 +94,7 @@ class RabbitMQBroker:
                     self.logger.info("Message consumption cancelled")
                     raise
                 except Exception as e:
-                    self.logger.error("Error handling consuming message: %s", str(e))
+                    self.logger.error(
+                        "Error handling consuming message: %s", str(e)
+                    )
                     await message.nack(requeue=False)

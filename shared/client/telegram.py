@@ -5,8 +5,13 @@ from logging import getLogger
 from typing import Any
 
 from aiohttp import ClientSession
-from aiohttp.web_exceptions import HTTPBadRequest, HTTPUnauthorized, HTTPForbidden, HTTPConflict, \
-    HTTPInternalServerError
+from aiohttp.web_exceptions import (
+    HTTPBadRequest,
+    HTTPConflict,
+    HTTPForbidden,
+    HTTPInternalServerError,
+    HTTPUnauthorized,
+)
 
 API_URL = "https://api.telegram.org/"
 
@@ -60,9 +65,9 @@ class TelegramClient:
                 parameters = data.get("parameters")
 
                 if (
-                        parameters is not None
-                        and "retry_after" in parameters
-                        and tries_count < REQUEST_MAX_TRIES
+                    parameters is not None
+                    and "retry_after" in parameters
+                    and tries_count < REQUEST_MAX_TRIES
                 ):
                     await asyncio.sleep(parameters.get("retry_after"))
                     continue
@@ -85,18 +90,20 @@ class TelegramClient:
         return None
 
     async def get_updates(
-            self,
-            offset: int = 0,
-            limit: int = 100,
-            timeout: int = 0,
-            allowed_updates: list[str] = ("message", "callback_query")
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        timeout: int = 0,
+        allowed_updates: list[str] = ("message", "callback_query"),
     ) -> list[dict[str, Any]]:
         """Получает обновления с сервера телеграм
         Args:
             offset (int): identifier of the first update to be returned
             limit (int): limits the number of updates to be retrieved
-            timeout (int): timeout in seconds for long polling (should be positive)
-            allowed_updates: a json-serialized list of the update types you want your bot to receive
+            timeout (int): timeout in seconds for long polling
+                           (should be positive)
+            allowed_updates: a json-serialized list of the update types
+                             you want your bot to receive
         Return:
             список обновлений
         """
@@ -106,6 +113,6 @@ class TelegramClient:
                 "offset": offset,
                 "limit": limit,
                 "timeout": timeout,
-                "allowed_updates": allowed_updates
-            }
+                "allowed_updates": allowed_updates,
+            },
         )

@@ -12,6 +12,8 @@ from shared.rabbitmq_broker import RabbitMQBroker
 LOGGER_NAME = "telegram_poller"
 POLL_TIMEOUT = 10
 
+__all__ = ("TelegramPoller",)
+
 
 class TelegramPoller:
     def __init__(self):
@@ -51,7 +53,9 @@ class TelegramPoller:
         offset = 0
         while self.is_running:
             try:
-                updates = await self.client.get_updates(offset=offset, timeout=POLL_TIMEOUT)
+                updates = await self.client.get_updates(
+                    offset=offset, timeout=POLL_TIMEOUT
+                )
                 if updates:
                     offset = await self._process_updates(updates)
             except (HTTPConflict, HTTPUnauthorized) as e:
