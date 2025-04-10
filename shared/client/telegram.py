@@ -89,13 +89,26 @@ class TelegramClient:
 
     async def get_updates(
             self,
-            requested_updates: RequestedUpdate
+            offset: int = 0,
+            limit: int = 100,
+            timeout: int = 0,
+            allowed_updates: list[str] = ("message", "callback_query")
     ) -> list[dict[str, Any]]:
         """Получает обновления с сервера телеграм
         Args:
-            requested_updates (RequestedUpdate): информация для получения обновлений
+            offset (int): identifier of the first update to be returned
+            limit (int): limits the number of updates to be retrieved
+            timeout (int): timeout in seconds for long polling (should be positive)
+            allowed_updates: a json-serialized list of the update types you want your bot to receive
         Return:
             список обновлений
         """
-        data = RequestedUpdateSchema().dump(requested_updates)
-        return await self._make_request(ApiMethods.get_updates, json=data)
+        return await self._make_request(
+            ApiMethods.get_updates,
+            json={
+                "offset": offset,
+                "limit": limit,
+                "timeout": timeout,
+                "allowed_updates": allowed_updates
+            }
+        )

@@ -95,10 +95,3 @@ class UpdateSchema(BaseSchema):
     update_id = fields.Int(required=True)
     message = fields.Nested(MessageSchema, allow_none=True)
     callback_query = fields.Nested(CallbackQuerySchema, allow_none=True)
-
-
-class RequestedUpdateSchema(BaseSchema):
-    offset = fields.Int(allow_none=True)
-    limit = fields.Int(default=100)
-    timeout = fields.Int(default=0)
-    allowed_updates = fields.List(fields.Str(), allow_none=True)

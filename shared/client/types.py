@@ -57,11 +57,3 @@ class Update:
     update_id: int
     message: Message | None = None
     callback_query: CallbackQuery | None = None
-
-
-@dataclass
-class RequestedUpdate:
-    offset: int | None = None
-    limit: int = 100
-    timeout: int = 0
-    allowed_updates: list[str] | None = None
