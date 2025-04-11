@@ -1,5 +1,6 @@
 import typing
 
+from data_service.store.admin.accessor import AdminAccessor
 from data_service.store.database import Database
 from data_service.store.quiz.accessor import QuestionAccessor, UserAccessor
 
@@ -12,6 +13,7 @@ class Store:
         self.app = app
         self.question_accessor = QuestionAccessor(app, session_factory)
         self.user_accessor = UserAccessor(app, session_factory)
+        self.admin_accessor = AdminAccessor(app, session_factory)
 
 
 def setup_store(app: "Application"):

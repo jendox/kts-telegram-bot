@@ -33,3 +33,4 @@ webargs==8.4.0
 yarl==1.9.4
 
 aio-pika~=9.5.5
+argon2-cffi==23.1.0
