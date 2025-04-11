@@ -1,7 +1,7 @@
 from sqlalchemy import delete, insert, select, update
 
-from database.models.chat_state import ChatState
-from database.repositories.base_repo import BaseRepository
+from data_service.quiz.models import ChatState
+from data_service.store.repositories.base_repo import BaseRepository
 
 
 class FSMStateRepository(BaseRepository):

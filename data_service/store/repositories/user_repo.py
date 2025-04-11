@@ -1,7 +1,7 @@
 from sqlalchemy import select, update
 
-from database.models.user import User
-from database.repositories.base_repo import BaseRepository
+from data_service.quiz.models import User
+from data_service.store.repositories.base_repo import BaseRepository
 
 
 class UserRepository(BaseRepository):

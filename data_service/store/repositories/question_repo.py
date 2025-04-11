@@ -1,31 +1,31 @@
-import random
 from collections.abc import Iterable, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from database.models.answer import Answer
-from database.models.question import Question
-from database.repositories.base_repo import BaseRepository
+from data_service.quiz.models import Answer, Question
+from data_service.store.repositories.base_repo import BaseRepository
 
 
 class QuestionRepository(BaseRepository):
     async def get_by_id(self, question_id: int) -> Question | None:
-        return await self.session.scalar(
-            select(Question).where(Question.id == question_id)
-        )
+        stmt = select(Question).where(Question.id == question_id)
+        return await self.session.scalar(stmt)
 
     async def get_all(self) -> Sequence[Question]:
         stmt = select(Question).options(joinedload(Question.answers))
         result = await self.session.execute(stmt)
-        scalar_result = result.unique().scalars()
-        return scalar_result.all()
+        return result.scalars().all()
 
     async def get_random(self) -> Question | None:
-        result = await self.session.execute(select(Question.id))
+        stmt = select(Question.id)
+        result = await self.session.execute(stmt)
         ids = result.scalars().all()
-        question_id = ids[random.randint(0, len(ids))]
-        return await self.get_by_id(question_id)
+        if ids:
+            import random
+
+            return await self.get_by_id(random.choices(ids))
+        return None
 
     async def create_question(
         self, title: str, answers: Iterable[Answer]

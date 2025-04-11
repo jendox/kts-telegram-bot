@@ -1,4 +1,5 @@
 import os
+import typing
 
 from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import (
@@ -9,18 +10,22 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-from database.sqlalchemy_base import BaseModel
+from data_service.store.database.sqlalchemy_base import BaseModel
 
 __all__ = ("Database",)
 
+if typing.TYPE_CHECKING:
+    from data_service.web.app import Application
+
 
 class Database:
-    def __init__(self):
+    def __init__(self, app: "Application"):
+        self.app = app
         self.engine: AsyncEngine | None = None
         self._db: type[DeclarativeBase] = BaseModel
         self.session: async_sessionmaker[AsyncSession] | None = None
 
-    async def connect(self) -> None:
+    async def connect(self, *args, **kwargs) -> None:
         self.engine = create_async_engine(
             URL.create(
                 drivername=os.getenv("POSTGRES_DRIVER_NAME"),
@@ -40,6 +45,6 @@ class Database:
             autocommit=False,
         )
 
-    async def disconnect(self) -> None:
+    async def disconnect(self, *args, **kwargs) -> None:
         if self.engine:
             await self.engine.dispose()
