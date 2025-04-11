@@ -1,6 +1,10 @@
 from marshmallow import Schema, fields
 
 
+class UserTelegramIdSchema(Schema):
+    telegram_id = fields.Str(required=True)
+
+
 class UserSchema(Schema):
     id = fields.Int(required=False)
     telegram_id = fields.Str(required=True)

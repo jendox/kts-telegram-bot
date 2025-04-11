@@ -1,3 +1,4 @@
+import random
 from collections.abc import Iterable, Sequence
 
 from sqlalchemy import select
@@ -22,9 +23,8 @@ class QuestionRepository(BaseRepository):
         result = await self.session.execute(stmt)
         ids = result.scalars().all()
         if ids:
-            import random
-
             return await self.get_by_id(random.choices(ids))
+
         return None
 
     async def create_question(

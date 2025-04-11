@@ -1,33 +1,11 @@
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
+from data_service.quiz.models.question import Question
 from data_service.store.database.sqlalchemy_base import (
     BaseModel,
     prim_inc_an,
-    uniq_str_an,
 )
-
-
-class User(BaseModel):
-    __tablename__ = "users"
-
-    id: Mapped[prim_inc_an]
-    telegram_id: Mapped[str] = mapped_column(
-        unique=True, index=True, nullable=False
-    )
-    username: Mapped[str] = mapped_column(nullable=True)
-    full_name: Mapped[str] = mapped_column(nullable=True)
-
-
-class Question(BaseModel):
-    __tablename__ = "questions"
-
-    id: Mapped[prim_inc_an]
-    title: Mapped[uniq_str_an]
-
-    answers: Mapped[list["Answer"]] = relationship(
-        "Answer", back_populates="question", cascade="all, del-orphan"
-    )
 
 
 class Answer(BaseModel):
@@ -37,7 +15,7 @@ class Answer(BaseModel):
     title: Mapped[str]
     points: Mapped[int]
     question_id: Mapped[int] = mapped_column(
-        ForeignKey("questions.id"), ondelete="CASCADE"
+        ForeignKey("questions.id", ondelete="CASCADE")
     )
     question: Mapped[Question] = relationship(
         "Question", back_populates="answers"
@@ -52,10 +30,3 @@ class Answer(BaseModel):
         if not (0 < value <= 100):
             raise ValueError("Points must be between 0 and 100")
         return value
-
-
-class ChatState(BaseModel):
-    __tablename__ = "chat_states"
-
-    chat_id: Mapped[str] = mapped_column(primary_key=True)
-    state: Mapped[str]

@@ -1,12 +1,13 @@
 import typing
-from typing import Callable, AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from functools import wraps
 from logging import getLogger
 
 if typing.TYPE_CHECKING:
-    from data_service.web.app import Application
     from sqlalchemy.ext.asyncio import AsyncSession
+
+    from data_service.web.app import Application
 
 
 def with_session(func):
@@ -20,11 +21,11 @@ def with_session(func):
 
 class BaseAccessor:
     def __init__(
-            self,
-            app: "Application",
-            session_factory: Callable[[], "AsyncSession"] | None = None,
-            *args,
-            **kwargs
+        self,
+        app: "Application",
+        session_factory: Callable[[], "AsyncSession"] | None = None,
+        *args,
+        **kwargs,
     ):
         self.app = app
         self.logger = getLogger(f"{self.__class__.__name__}")
