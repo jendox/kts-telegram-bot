@@ -1,2 +1,3 @@
 broker:
   type: rabbitmq
+  queue: tg_updates

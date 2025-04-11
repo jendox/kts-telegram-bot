@@ -13,7 +13,7 @@ __all__ = ("RabbitMQBroker",)
 
 LOGGER_NAME = "rabbitmq"
 DEFAULT_URL = "amqp://guest:guest@127.0.0.1/"
-DEFAULT_QUEUE_NAME = "telegram"
+DEFAULT_QUEUE_NAME = "tg_updates"
 MESSAGE_ENCODING = "utf-8"
 
 
@@ -71,7 +71,7 @@ class RabbitMQBroker(MessageBroker):
                     delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
                 ),
             )
-            self.logger.info(
+            self.logger.debug(
                 "Message successfully published\nMessage: %s", message
             )
         except Exception as e:

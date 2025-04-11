@@ -14,6 +14,7 @@ __all__ = (
 @dataclass
 class BrokerConfig:
     type: BrokerType
+    queue: str
 
 
 @dataclass
@@ -25,4 +26,7 @@ def load_config(config_path: str) -> Config:
     with open(config_path, "r") as file:
         data = safe_load(file)
 
-        return Config(BrokerConfig(type=BrokerType(data["broker"]["type"])))
+        return Config(BrokerConfig(
+            type=BrokerType(data["broker"]["type"]),
+            queue=data["broker"]["queue"]
+        ))
