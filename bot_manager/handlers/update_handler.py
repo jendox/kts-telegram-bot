@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from bot_manager.dataservice_client import DataServiceClient
 from bot_manager.handlers.callback_handler import CallbackHandler
 from bot_manager.handlers.message_handler import MessageHandler
 from shared.client.schemes import UpdateSchema
@@ -8,11 +7,10 @@ from shared.client.telegram import TelegramClient
 
 
 class UpdateHandler:
-    def __init__(self, client: TelegramClient, dsv_client: DataServiceClient):
+    def __init__(self, client: TelegramClient):
         self.logger = getLogger(self.__class__.__name__)
         self.telegram_client = client
-        self.dsv_client = dsv_client
-        self.message_handler = MessageHandler(client, dsv_client)
+        self.message_handler = MessageHandler(client)
         self.callback_handler = CallbackHandler(client)
 
     async def handle_updates(self, message: str):

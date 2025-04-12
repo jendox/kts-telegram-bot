@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from marshmallow import Schema, fields, post_load, EXCLUDE
+from marshmallow import EXCLUDE, Schema, fields, post_load
 
 
 @dataclass

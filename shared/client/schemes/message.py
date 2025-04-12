@@ -13,9 +13,9 @@ from shared.client.types import (
 
 __all__ = (
     "MessageEntitySchema",
+    "MessageReplySchema",
     "MessageSchema",
     "ReplyParametersSchema",
-    "MessageReplySchema",
 )
 
 

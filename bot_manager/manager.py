@@ -36,7 +36,7 @@ class BotManager:
     async def _start_telegram_client(self):
         self.client = TelegramClient()
         await self.client.start()
-        self.update_handler = UpdateHandler(self.client, self.dsv_client)
+        self.update_handler = UpdateHandler(self.client)
 
     async def _start_bot_poller(self):
         self.poller = BotPoller(

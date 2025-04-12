@@ -3,7 +3,7 @@ import os
 from aiohttp import ClientSession
 
 from bot_manager.token_manager import TokenManager
-from bot_manager.types import QuestionSchema, Question
+from bot_manager.types import Question, QuestionSchema
 
 
 class DataServiceClient:
@@ -16,7 +16,7 @@ class DataServiceClient:
         token = await self.token_manager.token()
         return {
             "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
     async def start(self):
