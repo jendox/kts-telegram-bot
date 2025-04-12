@@ -8,7 +8,6 @@ from aiohttp_session import get_session
 
 from data_service.admin.models import Admin
 from data_service.web.jwt_utils import UserRole, decode_jwt
-
 # from data_service.admin.models import AdminModel
 from data_service.web.utils import error_json_response
 
@@ -65,7 +64,11 @@ async def auth_middleware(request: "Request", handler):
         token = auth.removeprefix("Bearer ").strip()
         payload = decode_jwt(token)
         if payload:
-            request.actor = payload
+            # request.actor = payload
+            request.actor = {
+                "role": UserRole(payload.get("role")) if payload.get("role") else None,
+                "id": payload.get("sub")
+            }
             return await handler(request)
 
     session = await get_session(request)
