@@ -10,7 +10,7 @@ class User(BaseModel):
     __tablename__ = "users"
 
     id: Mapped[prim_inc_an]
-    telegram_id: Mapped[str] = mapped_column(
+    telegram_id: Mapped[int] = mapped_column(
         unique=True, index=True, nullable=False
     )
     username: Mapped[str] = mapped_column(nullable=True)

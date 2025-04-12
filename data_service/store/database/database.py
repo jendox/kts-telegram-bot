@@ -1,7 +1,5 @@
-import os
 import typing
 
-from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -27,14 +25,7 @@ class Database:
 
     async def connect(self, *args, **kwargs) -> None:
         self.engine = create_async_engine(
-            URL.create(
-                drivername=os.getenv("POSTGRES_DRIVER_NAME"),
-                username=os.getenv("POSTGRES_USER"),
-                password=os.getenv("POSTGRES_PASSWORD"),
-                host=os.getenv("POSTGRES_HOST"),
-                port=os.getenv("POSTGRES_PORT"),
-                database=os.getenv("POSTGRES_DB"),
-            ),
+            url=self.app.config.database.url,
             echo=True,
         )
         self.session = async_sessionmaker(

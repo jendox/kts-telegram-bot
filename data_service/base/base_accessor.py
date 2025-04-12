@@ -23,18 +23,18 @@ class BaseAccessor:
     def __init__(
         self,
         app: "Application",
-        session_factory: Callable[[], "AsyncSession"] | None = None,
         *args,
         **kwargs,
     ):
         self.app = app
         self.logger = getLogger(f"{self.__class__.__name__}")
-        self.session_factory = session_factory
+        self.session_factory: Callable[[], "AsyncSession"] | None = None
 
         app.on_startup.append(self.connect)
         app.on_cleanup.append(self.disconnect)
 
     async def connect(self, app: "Application"):
+        self.session_factory = app.database.session
         return
 
     async def disconnect(self, app: "Application"):

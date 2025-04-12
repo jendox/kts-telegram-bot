@@ -22,6 +22,6 @@ class QuestionAccessor(BaseAccessor):
 
 class UserAccessor(BaseAccessor):
     @with_session
-    async def get_by_telegram_id(self, session, telegram_id: str):
+    async def get_by_telegram_id(self, session, telegram_id: int):
         repo = UserRepository(session)
         return await repo.get_by_telegram_id(telegram_id)

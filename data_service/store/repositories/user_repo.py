@@ -5,7 +5,7 @@ from data_service.store.repositories.base_repo import BaseRepository
 
 
 class UserRepository(BaseRepository):
-    async def get_by_telegram_id(self, telegram_id: str) -> User | None:
+    async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         return await self.session.scalar(
             select(User).where(User.telegram_id == telegram_id)
         )
