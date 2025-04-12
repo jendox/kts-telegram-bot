@@ -3,8 +3,9 @@ import typing
 from data_service.quiz.views import (
     QuestionAddView,
     QuestionDeleteView,
+    QuestionListView,
     QuestionRandomView,
-    UserView, QuestionListView,
+    UserView,
 )
 
 if typing.TYPE_CHECKING:

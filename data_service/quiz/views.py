@@ -1,7 +1,7 @@
 import json
 
 from aiohttp.web_exceptions import HTTPConflict, HTTPInternalServerError
-from aiohttp_apispec import request_schema, response_schema, docs
+from aiohttp_apispec import request_schema, response_schema
 from sqlalchemy.exc import IntegrityError
 
 from data_service.quiz.schemes import (
@@ -16,6 +16,7 @@ from data_service.web.decorators import required_roles
 from data_service.web.jwt_utils import UserRole
 from data_service.web.mixins import RoleRequiredMixin
 from data_service.web.utils import json_response
+
 
 @required_roles(UserRole.ADMIN)
 class QuestionAddView(RoleRequiredMixin, View):

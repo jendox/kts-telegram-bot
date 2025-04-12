@@ -7,17 +7,19 @@ from typing import Any
 from aiohttp import ClientSession
 from aiohttp.web_exceptions import (
     HTTPBadRequest,
+    HTTPClientError,
     HTTPConflict,
     HTTPForbidden,
     HTTPInternalServerError,
     HTTPUnauthorized,
 )
 
+from shared.client.schemes import CallbackQueryReplySchema, MessageReplySchema
+from shared.client.types import CallbackQueryReply, MessageReply
+
 API_URL = "https://api.telegram.org/"
 
 REQUEST_MAX_TRIES = 5
-
-LOGGER_NAME = "telegram_client"
 
 
 class ApiMethods:
@@ -28,7 +30,7 @@ class ApiMethods:
 
 class TelegramClient:
     def __init__(self):
-        self.logger = getLogger(LOGGER_NAME)
+        self.logger = getLogger(self.__class__.__name__)
         self.token: str | None = None
         self.session: ClientSession | None = None
 
@@ -115,4 +117,28 @@ class TelegramClient:
                 "timeout": timeout,
                 "allowed_updates": allowed_updates,
             },
+        )
+
+    async def send_message(self, message: MessageReply):
+        """Отправляет сообщение на сервер телеграм
+        Args:
+            message: сообщение
+        """
+        try:
+            await self._make_request(
+                ApiMethods.send_message, json=MessageReplySchema().dump(message)
+            )
+        except HTTPClientError as e:
+            self.logger.error("Error sending message: %s", str(e))
+
+    async def answer_callback_query(
+        self, callback_query_reply: CallbackQueryReply
+    ) -> None:
+        """Отсылает обязательный ответ на сервер телеграм
+        Args:
+            callback_query_reply: коллбек ответ
+        """
+        await self._make_request(
+            ApiMethods.answer_callback_query,
+            json=CallbackQueryReplySchema().dump(callback_query_reply),
         )

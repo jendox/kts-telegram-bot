@@ -8,6 +8,7 @@ from aiohttp.web_exceptions import HTTPConflict, HTTPUnauthorized
 
 from shared.broker import BrokerType, MessageBroker, get_broker
 from shared.client.telegram import TelegramClient
+from shared.poller import Poller
 
 LOGGER_NAME = "telegram_poller"
 POLL_TIMEOUT = 10
@@ -15,7 +16,7 @@ POLL_TIMEOUT = 10
 __all__ = ("TelegramPoller",)
 
 
-class TelegramPoller:
+class TelegramPoller(Poller):
     def __init__(self, broker_type: BrokerType):
         self.logger = getLogger(LOGGER_NAME)
         self.broker_type = broker_type
