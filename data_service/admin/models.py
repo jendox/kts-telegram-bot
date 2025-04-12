@@ -20,9 +20,7 @@ class Admin(BaseModel):
     password: Mapped[str]
 
     def is_password_valid(self, password: str):
-        return PasswordHasher().verify(
-            hash=self.password, password=password
-        )
+        return PasswordHasher().verify(hash=self.password, password=password)
 
     @staticmethod
     def hash_password(password: str) -> str:
@@ -32,8 +30,7 @@ class Admin(BaseModel):
     def from_session(cls, session: Session) -> Optional["Admin"]:
         try:
             return cls(
-                id=session["admin"]["id"],
-                email=session["admin"]["email"]
+                id=session["admin"]["id"], email=session["admin"]["email"]
             )
         except KeyError:
             return None

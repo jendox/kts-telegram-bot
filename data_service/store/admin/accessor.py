@@ -36,7 +36,9 @@ class AdminAccessor(BaseAccessor):
         repo = AdminRepository(session)
         return await repo.create(email, password)
 
-    async def login(self, request: "Request", email: str, password: str) -> Admin:
+    async def login(
+        self, request: "Request", email: str, password: str
+    ) -> Admin:
         admin = await self.current(request)
         if admin is None:
             admin = await self.get_by_email(email=email)
@@ -49,7 +51,7 @@ class AdminAccessor(BaseAccessor):
                 text=json.dumps(
                     {
                         "http_status": HTTPStatus.FORBIDDEN,
-                        "error": "invalid credentials"
+                        "error": "invalid credentials",
                     }
                 )
             )

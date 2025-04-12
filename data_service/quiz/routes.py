@@ -1,6 +1,10 @@
 import typing
 
-from data_service.quiz.views import QuestionRandomView, UserView, QuestionDeleteView
+from data_service.quiz.views import (
+    QuestionDeleteView,
+    QuestionRandomView,
+    UserView,
+)
 
 if typing.TYPE_CHECKING:
     from data_service.web.app import Application

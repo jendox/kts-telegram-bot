@@ -1,7 +1,7 @@
 import random
 from collections.abc import Iterable, Sequence
 
-from sqlalchemy import select, delete
+from sqlalchemy import delete, select
 from sqlalchemy.orm import joinedload
 
 from data_service.quiz.models import Answer, Question
@@ -28,7 +28,7 @@ class QuestionRepository(BaseRepository):
         return None
 
     async def create(
-            self, title: str, answers: Iterable[Answer]
+        self, title: str, answers: Iterable[Answer]
     ) -> Question | None:
         answers = list(answers)
 

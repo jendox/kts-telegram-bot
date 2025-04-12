@@ -10,10 +10,7 @@ class AdminRepository(BaseRepository):
         return await self.session.scalar(stmt)
 
     async def create(self, email: str, password: str) -> Admin:
-        admin = Admin(
-            email=email,
-            password=Admin.hash_password(password)
-        )
+        admin = Admin(email=email, password=Admin.hash_password(password))
         self.session.add(admin)
         await self.session.commit()
         await self.session.refresh(admin)

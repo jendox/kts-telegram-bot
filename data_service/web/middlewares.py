@@ -7,6 +7,8 @@ from aiohttp_apispec import validation_middleware
 from aiohttp_session import get_session
 
 from data_service.admin.models import Admin
+from data_service.web.jwt_utils import UserRole, decode_jwt
+
 # from data_service.admin.models import AdminModel
 from data_service.web.utils import error_json_response
 
@@ -53,8 +55,23 @@ async def error_handling_middleware(request: "Request", handler):
 
 @middleware
 async def auth_middleware(request: "Request", handler):
+    # session = await get_session(request)
+    # request.admin = Admin.from_session(session)
+    # return await handler(request)
+    request.actor = None
+
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        token = auth.removeprefix("Bearer ").strip()
+        payload = decode_jwt(token)
+        if payload:
+            request.actor = payload
+            return await handler(request)
+
     session = await get_session(request)
-    request.admin = Admin.from_session(session)
+    admin = Admin.from_session(session)
+    if admin:
+        request.actor = {"role": UserRole.ADMIN, "id": admin.id}
     return await handler(request)
 
 

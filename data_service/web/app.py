@@ -12,7 +12,7 @@ from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from data_service.admin.models import Admin
 from data_service.store.database.database import Database
 from data_service.store.store import Store, setup_store
-from data_service.web.config import setup_config, Config
+from data_service.web.config import Config, setup_config
 from data_service.web.logger import setup_logging
 from data_service.web.middlewares import setup_middlewares
 from data_service.web.routes import setup_routes

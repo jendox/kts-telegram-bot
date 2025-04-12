@@ -35,7 +35,6 @@ class BaseAccessor:
 
     async def connect(self, app: "Application"):
         self.session_factory = app.database.session
-        return
 
     async def disconnect(self, app: "Application"):
         return
