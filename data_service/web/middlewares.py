@@ -6,6 +6,7 @@ from aiohttp.web_middlewares import middleware
 from aiohttp_apispec import validation_middleware
 from aiohttp_session import get_session
 
+from data_service.admin.models import Admin
 # from data_service.admin.models import AdminModel
 from data_service.web.utils import error_json_response
 
@@ -53,7 +54,7 @@ async def error_handling_middleware(request: "Request", handler):
 @middleware
 async def auth_middleware(request: "Request", handler):
     session = await get_session(request)
-    # request.admin = AdminModel.from_session(session)
+    request.admin = Admin.from_session(session)
     return await handler(request)
 
 

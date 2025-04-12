@@ -2,6 +2,7 @@ from aiohttp_apispec import request_schema, response_schema
 
 from data_service.admin.schemes import AdminSchema
 from data_service.web.app import View
+from data_service.web.mixins import AuthRequiredMixin
 from data_service.web.utils import json_response
 
 
@@ -17,13 +18,13 @@ class AdminLoginView(View):
         return json_response(data=AdminSchema().dump(admin))
 
 
-class AdminCurrentView(View):
+class AdminCurrentView(AuthRequiredMixin, View):
     async def get(self):
         admin = await self.store.admin_accessor.current(self.request)
         return json_response(data=AdminSchema().dump(admin))
 
 
-class AdminLogoutView(View):
+class AdminLogoutView(AuthRequiredMixin, View):
     async def get(self):
         await self.store.admin_accessor.logout(self.request)
         return json_response()
