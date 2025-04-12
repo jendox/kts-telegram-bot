@@ -1,5 +1,6 @@
 import random
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import joinedload
@@ -28,22 +29,15 @@ class QuestionRepository(BaseRepository):
         return None
 
     async def create(
-        self, title: str, answers: Iterable[Answer]
+        self, title: str, answers: list[dict[str, Any]]
     ) -> Question | None:
-        answers = list(answers)
-
-        titles = [a.title.lower().strip() for a in answers]
-        if len(titles) != len(set(titles)):
-            raise ValueError("Duplicate answer titles found")
-
-        points = [a.points for a in answers]
-        if len(points) != len(set(points)):
-            raise ValueError("Duplicate answer points found")
-
+        answers = [
+            Answer(title=answer["title"], points=answer["points"])
+            for answer in answers
+        ]
         question = Question(title=title, answers=answers)
         self.session.add(question)
         await self.session.commit()
-        await self.session.refresh(question)
         return question
 
     async def delete(self, question_id: int) -> None:

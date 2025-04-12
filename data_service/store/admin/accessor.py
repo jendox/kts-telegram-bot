@@ -4,7 +4,6 @@ from http import HTTPStatus
 
 from aiohttp.web_exceptions import HTTPForbidden
 from aiohttp_session import get_session, new_session
-from sqlalchemy.exc import IntegrityError
 
 from data_service.admin.models import Admin
 from data_service.base.base_accessor import BaseAccessor, with_session
@@ -20,11 +19,9 @@ class AdminAccessor(BaseAccessor):
         email = app.config.admin.email
         password = app.config.admin.password
         async with app.database.session() as session:
-            try:
-                repo = AdminRepository(session)
+            repo = AdminRepository(session)
+            if not await repo.get_by_email(email):
                 await repo.create(email, password)
-            except IntegrityError:
-                pass
 
     @with_session
     async def get_by_email(self, session, email: str) -> Admin | None:

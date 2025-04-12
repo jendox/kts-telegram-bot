@@ -1,4 +1,8 @@
+import json
+
+from aiohttp.web_exceptions import HTTPConflict, HTTPInternalServerError
 from aiohttp_apispec import request_schema, response_schema
+from sqlalchemy.exc import IntegrityError
 
 from data_service.quiz.schemes import (
     ListQuestionSchema,
@@ -12,6 +16,23 @@ from data_service.web.decorators import required_roles
 from data_service.web.jwt_utils import UserRole
 from data_service.web.mixins import RoleRequiredMixin
 from data_service.web.utils import json_response
+
+
+@required_roles(UserRole.ADMIN)
+class QuestionAddView(RoleRequiredMixin, View):
+    @request_schema(QuestionSchema)
+    @response_schema(QuestionSchema)
+    async def post(self):
+        try:
+            question = await self.store.question_accessor.create_question(
+                self.data["title"], self.data["answers"]
+            )
+        except IntegrityError as e:
+            data = {"error": str(e)}
+            if e.orig.pgcode == "23505":
+                raise HTTPConflict(text=json.dumps(data)) from e
+            raise HTTPInternalServerError(text=json.dumps(data)) from e
+        return json_response(data=QuestionSchema().dump(question))
 
 
 @required_roles(UserRole.ADMIN)

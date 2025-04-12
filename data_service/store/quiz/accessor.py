@@ -1,9 +1,18 @@
+from typing import Any
+
 from data_service.base.base_accessor import BaseAccessor, with_session
 from data_service.store.repositories.question_repo import QuestionRepository
 from data_service.store.repositories.user_repo import UserRepository
 
 
 class QuestionAccessor(BaseAccessor):
+    @with_session
+    async def create_question(
+        self, session, title: str, answers: list[dict[str, Any]]
+    ):
+        repo = QuestionRepository(session)
+        return await repo.create(title, answers)
+
     @with_session
     async def get_all_questions(self, session):
         repo = QuestionRepository(session)
