@@ -30,3 +30,7 @@ class ListQuestionSchema(Schema):
 class ChatStateSchema(Schema):
     chat_id = fields.Str(required=True)
     state = fields.Str(required=True)
+
+
+class QuestionDeleteSchema(Schema):
+    id = fields.Int(required=True)

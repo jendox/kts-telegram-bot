@@ -1,7 +1,7 @@
 import random
 from collections.abc import Iterable, Sequence
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import joinedload
 
 from data_service.quiz.models import Answer, Question
@@ -27,8 +27,8 @@ class QuestionRepository(BaseRepository):
 
         return None
 
-    async def create_question(
-        self, title: str, answers: Iterable[Answer]
+    async def create(
+            self, title: str, answers: Iterable[Answer]
     ) -> Question | None:
         answers = list(answers)
 
@@ -45,3 +45,8 @@ class QuestionRepository(BaseRepository):
         await self.session.commit()
         await self.session.refresh(question)
         return question
+
+    async def delete(self, question_id: int) -> None:
+        stmt = delete(Question).where(Question.id == question_id)
+        await self.session.execute(stmt)
+        await self.session.commit()

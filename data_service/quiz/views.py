@@ -4,10 +4,20 @@ from data_service.quiz.schemes import (
     ListQuestionSchema,
     QuestionSchema,
     UserSchema,
-    UserTelegramIdSchema,
+    UserTelegramIdSchema, QuestionDeleteSchema,
 )
 from data_service.web.app import View
+from data_service.web.mixins import AuthRequiredMixin
 from data_service.web.utils import json_response
+
+
+class QuestionDeleteView(AuthRequiredMixin, View):
+    @request_schema(QuestionDeleteSchema)
+    async def post(self):
+        await self.store.question_accessor.delete_question(
+            self.data["id"]
+        )
+        return json_response()
 
 
 class QuestionListView(View):

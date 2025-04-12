@@ -19,6 +19,11 @@ class QuestionAccessor(BaseAccessor):
         repo = QuestionRepository(session)
         return await repo.get_by_id(question_id)
 
+    @with_session
+    async def delete_question(self, session, question_id: int):
+        repo = QuestionRepository(session)
+        return await repo.delete(question_id)
+
 
 class UserAccessor(BaseAccessor):
     @with_session

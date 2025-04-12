@@ -1,6 +1,6 @@
 import typing
 
-from data_service.quiz.views import QuestionRandomView, UserView
+from data_service.quiz.views import QuestionRandomView, UserView, QuestionDeleteView
 
 if typing.TYPE_CHECKING:
     from data_service.web.app import Application
@@ -9,4 +9,5 @@ if typing.TYPE_CHECKING:
 def setup_routes(app: "Application"):
     app.router.add_view("/quiz.random_question", QuestionRandomView)
     app.router.add_view("/quiz.list_questions", QuestionRandomView)
+    app.router.add_view("/quiz.delete_question", QuestionDeleteView)
     app.router.add_view("/quiz.user", UserView)
