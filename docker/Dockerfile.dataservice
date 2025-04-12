@@ -1,0 +1,8 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY data_service /app/data_service
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["python", "-m", "data_service.main"]

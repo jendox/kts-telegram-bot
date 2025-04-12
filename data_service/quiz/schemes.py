@@ -18,13 +18,13 @@ class UserSchema(Schema):
 
 
 class AnswerSchema(Schema):
-    id = fields.Int(required=False, load_only=True)
+    id = fields.Int(required=False)
     title = fields.Str(required=True)
     points = fields.Int(required=True)
 
 
 class QuestionSchema(Schema):
-    id = fields.Int(required=False, load_only=True)
+    id = fields.Int(required=False)
     title = fields.Str(required=True)
     answers = fields.Nested(AnswerSchema, required=True, many=True)
 

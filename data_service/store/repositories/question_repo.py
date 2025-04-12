@@ -19,7 +19,7 @@ class QuestionRepository(BaseRepository):
     async def get_all(self) -> Sequence[Question]:
         stmt = select(Question).options(joinedload(Question.answers))
         result = await self.session.execute(stmt)
-        return result.scalars().all()
+        return result.unique().scalars().all()
 
     async def get_random(self) -> Question | None:
         stmt = select(Question.id)

@@ -1,7 +1,7 @@
 import json
 
 from aiohttp.web_exceptions import HTTPConflict, HTTPInternalServerError
-from aiohttp_apispec import request_schema, response_schema
+from aiohttp_apispec import request_schema, response_schema, docs
 from sqlalchemy.exc import IntegrityError
 
 from data_service.quiz.schemes import (
@@ -17,11 +17,10 @@ from data_service.web.jwt_utils import UserRole
 from data_service.web.mixins import RoleRequiredMixin
 from data_service.web.utils import json_response
 
-
 @required_roles(UserRole.ADMIN)
 class QuestionAddView(RoleRequiredMixin, View):
     @request_schema(QuestionSchema)
-    @response_schema(QuestionSchema)
+    @response_schema(QuestionSchema, 200)
     async def post(self):
         try:
             question = await self.store.question_accessor.create_question(
@@ -43,7 +42,7 @@ class QuestionDeleteView(RoleRequiredMixin, View):
         return json_response()
 
 
-@required_roles(UserRole.ADMIN, UserRole.BOT)
+@required_roles(UserRole.ADMIN)
 class QuestionListView(RoleRequiredMixin, View):
     @response_schema(ListQuestionSchema)
     async def get(self):
