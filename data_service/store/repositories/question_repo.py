@@ -11,7 +11,9 @@ from data_service.store.repositories.base_repo import BaseRepository
 
 class QuestionRepository(BaseRepository):
     async def get_by_id(self, question_id: int) -> Question | None:
-        stmt = select(Question).where(Question.id == question_id)
+        stmt = (select(Question).where(Question.id == question_id)).options(
+            joinedload(Question.answers)
+        )
         return await self.session.scalar(stmt)
 
     async def get_all(self) -> Sequence[Question]:
@@ -24,7 +26,7 @@ class QuestionRepository(BaseRepository):
         result = await self.session.execute(stmt)
         ids = result.scalars().all()
         if ids:
-            return await self.get_by_id(random.choices(ids))
+            return await self.get_by_id(random.choices(ids)[0])
 
         return None
 
