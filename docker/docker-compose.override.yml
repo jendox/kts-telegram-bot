@@ -4,3 +4,7 @@ services:
   web:
     volumes:
       - ../data_service:/app/data_service
+
+  poller:
+    volumes:
+      - ../poller:/app/poller

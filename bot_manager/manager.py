@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging import getLogger
 
 from bot_manager.dataservice_client import DataServiceClient
@@ -15,7 +16,7 @@ class BotManager:
         self.config: Config = config
         self.poller: Poller | None = None
         self.update_handler: UpdateHandler | None = None
-        self.client: TelegramClient | None = None
+        self.tg_client: TelegramClient | None = None
         self.dsv_client: DataServiceClient | None = None
         self._shutdown_event: asyncio.Event | None = None
 
@@ -28,15 +29,15 @@ class BotManager:
     async def stop(self):
         if self.poller:
             await self.poller.stop()
-        if self.client:
-            await self.client.stop()
+        if self.tg_client:
+            await self.tg_client.stop()
         if self.dsv_client:
             await self.dsv_client.stop()
 
     async def _start_telegram_client(self):
-        self.client = TelegramClient()
-        await self.client.start()
-        self.update_handler = UpdateHandler(self.client)
+        self.tg_client = TelegramClient()
+        await self.tg_client.start()
+        self.update_handler = UpdateHandler(self.tg_client)
 
     async def _start_bot_poller(self):
         self.poller = BotPoller(
@@ -45,7 +46,7 @@ class BotManager:
         await self.poller.start()
 
     async def _start_dsv_client(self):
-        self.dsv_client = DataServiceClient("http://localhost:8080")
+        self.dsv_client = DataServiceClient(os.getenv("API_URL"))
         await self.dsv_client.start()
 
     async def waiting_for_shutdown(self) -> None:
