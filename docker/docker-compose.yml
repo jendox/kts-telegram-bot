@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./_storage/postgres_data:/var/lib/postgresql/data
+      - ../_storage/postgres_data:/var/lib/postgresql/data
     networks:
       - bot-net
     healthcheck:
@@ -35,6 +35,36 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../_storage/redis_data:/data
+    networks:
+      - bot-net
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    restart: unless-stopped
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - bot-net
 
   poller:
     image: poller-image
@@ -69,6 +99,7 @@ volumes:
   rabbitmq_data:
   rabbitmq_log:
   postgres_data:
+  redis_data:
 
 networks:
   bot-net:

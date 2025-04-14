@@ -2,7 +2,7 @@ import os
 
 from aiohttp import ClientSession
 
-from bot_manager.token_manager import TokenManager
+from bot_manager.services.token_manager import TokenManager
 from bot_manager.types import Question, QuestionSchema
 
 
@@ -20,7 +20,8 @@ class DataServiceClient:
         }
 
     async def start(self):
-        await self._start_token_manager()
+        self.token_manager = TokenManager(os.getenv("JWT_SECRET"))
+        await self.token_manager.start()
         self.client = ClientSession(base_url=self.base_url)
 
     async def stop(self):
@@ -28,10 +29,6 @@ class DataServiceClient:
             await self.token_manager.stop()
         if self.client:
             await self.client.close()
-
-    async def _start_token_manager(self):
-        self.token_manager = TokenManager(os.getenv("JWT_SECRET"))
-        await self.token_manager.start()
 
     async def get_random_question(self) -> Question | None:
         headers = await self._headers()
@@ -42,3 +39,9 @@ class DataServiceClient:
             data = await result.json()
             return QuestionSchema().load(data["data"])
         return None
+
+    async def save_result(self):
+        pass
+
+    async def get_result(self):
+        pass
