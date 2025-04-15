@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from bot_manager.services.dataservice_client import DataServiceClient
-from bot_manager.services.game_manager import GameManager
+from bot_manager.game.manager import GameManager
 from shared.client.schemes import UpdateSchema
 from shared.client.telegram import TelegramClient
 from shared.client.types import MessageReply, Message, CallbackQuery, CallbackQueryReply
@@ -39,9 +39,7 @@ class Dispatcher:
     async def _handle_message(self, message: Message):
         try:
             self.logger.info("Handle message: %s", message)
-            result = await self.game_manager.process_message(message)
-            if isinstance(result, MessageReply):
-                await self.tg.send_message(result)
+            await self.game_manager.process_message(message)
         except Exception as e:
             self.logger.error("Error handling update: %s", str(e))
 

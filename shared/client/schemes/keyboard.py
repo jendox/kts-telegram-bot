@@ -19,9 +19,9 @@ class InlineKeyboardButtonSchema(BaseSchema):
     text = fields.Str(required=True)
     callback_data = fields.Str(required=True)
 
-    @post_load
-    def make_button(self, data, **kwargs):
-        return InlineKeyboardButton(**data)
+    # @post_load
+    # def make_button(self, data, **kwargs):
+    #     return InlineKeyboardButton(**data)
 
 
 class InlineKeyboardMarkupSchema(BaseSchema):
@@ -32,9 +32,9 @@ class InlineKeyboardMarkupSchema(BaseSchema):
         fields.List(fields.Nested(InlineKeyboardButtonSchema), required=True)
     )
 
-    @post_load
-    def make_markup(self, data, **kwargs):
-        return InlineKeyboardMarkup(**data)
+    # @post_load
+    # def make_markup(self, data, **kwargs):
+    #     return InlineKeyboardMarkup(**data)
 
     """
     markup_data = {

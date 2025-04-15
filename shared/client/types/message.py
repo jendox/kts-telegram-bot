@@ -43,6 +43,6 @@ class ReplyParameters:
 class MessageReply:
     chat_id: int
     text: str
-    parse_mode: str | None = None
+    parse_mode: str = "Markdown"
     reply_markup: InlineKeyboardMarkup | None = None
     reply_parameters: ReplyParameters | None = None

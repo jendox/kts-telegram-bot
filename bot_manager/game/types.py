@@ -1,0 +1,94 @@
+import datetime
+from dataclasses import dataclass, field
+
+from bot_manager.core.fsm import State
+from bot_manager.game.constatnts import GameState, MIN_PLAYERS
+
+
+@dataclass
+class Answer:
+    title: str
+    points: int
+
+
+@dataclass
+class Question:
+    title: str
+    answers: list[Answer]
+
+
+@dataclass
+class Player:
+    id: int
+    name: str
+    points: int = 0
+    is_active: bool = True
+
+
+@dataclass
+class GameSession:
+    chat_id: int
+    state: State = field(default_factory=GameState)
+    created_at: datetime.datetime = None
+    finished_at: datetime.datetime = None
+    players: list[Player] = field(default_factory=list)
+    question: Question = None
+    active_player: Player = None
+    given_answers: list[str] = field(default_factory=list)
+
+    @staticmethod
+    def _normalize(text: str) -> str:
+        return text.strip().capitalize()
+
+    def is_ready_to_start(self) -> bool:
+        return len(self.players) >= MIN_PLAYERS
+
+    def is_player_eliminated(self, user_id: int) -> bool:
+        player = self.get_player_by_id(user_id)
+        return not player.is_active if player else True
+
+    def get_active_player_name(self) -> str | None:
+        return self.active_player.name if self.active_player else None
+
+    def get_player_by_id(self, user_id: int) -> Player | None:
+        return next((p for p in self.players if p.id == user_id), None)
+
+    def add_player(self, user_id: int, username: str):
+        if not any(p.id == user_id for p in self.players):
+            self.players.append(Player(user_id, username))
+
+    def _find_answer(self, text: str) -> Answer | None:
+        normalized = self._normalize(text)
+        return next((a for a in self.question.answers if a.title == normalized), None)
+
+    def points_by_answer(self, text: str) -> int:
+        answer = self._find_answer(text)
+        return answer.points if answer else 0
+
+    def award_points(self, user_id: int, points: int):
+        player = self.get_player_by_id(user_id)
+        if player:
+            player.points += points
+
+    def is_answer_correct(self, text: str) -> bool:
+        return self._find_answer(text) is not None
+
+    def add_given_answer(self, text: str) -> bool:
+        normalized = self._normalize(text)
+        if normalized not in self.given_answers:
+            self.given_answers.append(normalized)
+            return True
+        return False
+
+    def is_game_state(self, state: State) -> bool:
+        return self.state == state
+
+    def eliminate_player(self, user_id: int):
+        player = self.get_player_by_id(user_id)
+        if player:
+            player.is_active = False
+        if self.active_player and self.active_player.id == user_id:
+            self.active_player = None
+
+    def count_active_players(self) -> int:
+        return sum(p.is_active for p in self.players)

@@ -2,8 +2,9 @@ import os
 
 from aiohttp import ClientSession
 
+from bot_manager.game.schemes import QuestionSchema
+from bot_manager.game.types import Question
 from bot_manager.services.token_manager import TokenManager
-from bot_manager.types import Question, QuestionSchema
 
 
 class DataServiceClient:
