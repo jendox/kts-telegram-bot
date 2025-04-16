@@ -41,6 +41,7 @@ def retry_async(
                         )
                         raise
                     await asyncio.sleep(delay * attempt)
+            return None
 
         return wrapper
 

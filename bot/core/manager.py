@@ -3,8 +3,7 @@ import os
 from logging import getLogger
 
 from bot.core.dispatcher import Dispatcher
-from bot.services import DataServiceClient
-from bot.services import BotPoller
+from bot.services import BotPoller, DataServiceClient
 from shared.client.telegram import TelegramClient
 from shared.config import Config
 from shared.poller import Poller

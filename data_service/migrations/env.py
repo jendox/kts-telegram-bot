@@ -7,7 +7,13 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from data_service.admin.models import Admin
-from data_service.quiz.models import Answer, ChatState, Question, User
+from data_service.quiz.models import (
+    Answer,
+    GameSession,
+    Player,
+    PlayerGameSession,
+    Question,
+)
 from data_service.store.database.sqlalchemy_base import BaseModel
 
 # this is the Alembic Config object, which provides

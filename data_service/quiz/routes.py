@@ -5,7 +5,7 @@ from data_service.quiz.views import (
     QuestionDeleteView,
     QuestionListView,
     QuestionRandomView,
-    UserView,
+    GameSessionSaveView,
 )
 
 if typing.TYPE_CHECKING:
@@ -17,4 +17,4 @@ def setup_routes(app: "Application"):
     app.router.add_view("/quiz.list_questions", QuestionListView)
     app.router.add_view("/quiz.add_question", QuestionAddView)
     app.router.add_view("/quiz.delete_question", QuestionDeleteView)
-    app.router.add_view("/quiz.user", UserView)
+    app.router.add_view("/quiz.save_game", GameSessionSaveView)

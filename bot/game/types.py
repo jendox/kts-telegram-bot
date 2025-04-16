@@ -7,12 +7,14 @@ from bot.game.constants import MIN_PLAYERS, GameState
 
 @dataclass
 class Answer:
+    id: int
     title: str
     points: int
 
 
 @dataclass
 class Question:
+    id: int
     title: str
     answers: list[Answer]
 
@@ -34,11 +36,7 @@ class GameSession:
     players: list[Player] = field(default_factory=list)
     question: Question = None
     active_player: Player = None
-    given_answers: list[str] = field(default_factory=list)
-
-    @staticmethod
-    def _normalize(text: str) -> str:
-        return text.strip().capitalize()
+    given_answers: list[Answer] = field(default_factory=list)
 
     def is_ready_to_start(self) -> bool:
         return len(self.players) >= MIN_PLAYERS
@@ -58,7 +56,7 @@ class GameSession:
             self.players.append(Player(user_id, username))
 
     def _find_answer(self, text: str) -> Answer | None:
-        normalized = self._normalize(text)
+        normalized = text.strip().capitalize()
         return next(
             (a for a in self.question.answers if a.title == normalized), None
         )
@@ -75,10 +73,14 @@ class GameSession:
     def is_answer_correct(self, text: str) -> bool:
         return self._find_answer(text) is not None
 
+    def is_already_answered(self, text: str) -> bool:
+        answer = self._find_answer(text)
+        return answer in self.given_answers
+
     def add_given_answer(self, text: str) -> bool:
-        normalized = self._normalize(text)
-        if normalized not in self.given_answers:
-            self.given_answers.append(normalized)
+        answer = self._find_answer(text)
+        if answer not in self.given_answers:
+            self.given_answers.append(answer)
             return True
         return False
 
@@ -94,6 +96,9 @@ class GameSession:
 
     def count_active_players(self) -> int:
         return sum(p.is_active for p in self.players)
+
+    def count_given_answers(self) -> int:
+        return len(self.given_answers)
 
     def set_finish_time(self):
         self.finished_at = datetime.datetime.now()

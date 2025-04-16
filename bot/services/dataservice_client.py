@@ -2,8 +2,8 @@ import os
 
 from aiohttp import ClientSession
 
-from bot.game.schemes import QuestionSchema
-from bot.game.types import Question
+from bot.game.schemes import GameSessionSchema, QuestionSchema
+from bot.game.types import GameSession, Question
 from bot.services.token_manager import TokenManager
 
 __all__ = ("DataServiceClient",)
@@ -43,8 +43,17 @@ class DataServiceClient:
             return QuestionSchema().load(data["data"])
         return None
 
-    async def save_result(self):
-        pass
+    async def save_game(self, session: GameSession):
+        data = GameSessionSchema().dump(session)
+        headers = await self._headers()
+        await self.client.post(
+            url="/quiz.save_game", headers=headers, json=data
+        )
 
-    async def get_result(self):
-        pass
+    async def get_last_game(self):
+        headers = await self._headers()
+        result = await self.client.get(url="/quiz.last_game", headers=headers)
+        if result.status == 200:
+            data = await result.json()
+            return GameSessionSchema().load(data["data"])
+        return None

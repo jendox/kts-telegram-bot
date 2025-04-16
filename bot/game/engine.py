@@ -1,4 +1,4 @@
-from bot.game.constants import GameState
+from bot.game.constants import MIN_PLAYERS, GameState
 from bot.game.types import GameSession, Player, Question
 
 
@@ -24,8 +24,8 @@ class GameEngine:
 
     def is_active_player(self, player_id: int) -> bool:
         return (
-                self._session.active_player
-                and self._session.active_player.id == player_id
+            self._session.active_player
+            and self._session.active_player.id == player_id
         )
 
     def award_points(self, player_id: int, text: str) -> int:
@@ -37,6 +37,9 @@ class GameEngine:
     def is_answer_correct(self, text: str) -> bool:
         return self._session.is_answer_correct(text)
 
+    def is_already_answered(self, text: str) -> bool:
+        return self._session.is_already_answered(text)
+
     def add_given_answer(self, text: str) -> bool:
         return self._session.add_given_answer(text)
 
@@ -45,3 +48,13 @@ class GameEngine:
 
     def count_active_players(self):
         return self._session.count_active_players()
+
+    def set_finish_time(self):
+        self._session.set_finish_time()
+
+    def is_game_continued(self):
+        return (
+            self.count_active_players() >= MIN_PLAYERS
+            and self._session.count_given_answers()
+            < len(self._session.question.answers)
+        )

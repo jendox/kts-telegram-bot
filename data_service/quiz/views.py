@@ -8,9 +8,9 @@ from data_service.quiz.schemes import (
     ListQuestionSchema,
     QuestionDeleteSchema,
     QuestionSchema,
-    UserSchema,
-    UserTelegramIdSchema,
+    GameSessionRequestSchema, GameSessionResponseSchema,
 )
+from data_service.quiz.utils import generate_session_hash, get_hash_base
 from data_service.web.app import View
 from data_service.web.decorators import required_roles
 from data_service.web.jwt_utils import UserRole
@@ -45,7 +45,7 @@ class QuestionDeleteView(RoleRequiredMixin, View):
 
 @required_roles(UserRole.ADMIN)
 class QuestionListView(RoleRequiredMixin, View):
-    @response_schema(ListQuestionSchema)
+    @response_schema(ListQuestionSchema, 200)
     async def get(self):
         questions = await self.store.question_accessor.get_all_questions()
         return json_response(
@@ -55,17 +55,28 @@ class QuestionListView(RoleRequiredMixin, View):
 
 @required_roles(UserRole.ADMIN, UserRole.BOT)
 class QuestionRandomView(RoleRequiredMixin, View):
-    @response_schema(QuestionSchema)
+    @response_schema(QuestionSchema, 200)
     async def get(self):
         question = await self.store.question_accessor.get_random_question()
         return json_response(data=QuestionSchema().dump(question))
 
 
 @required_roles(UserRole.ADMIN, UserRole.BOT)
-class UserView(RoleRequiredMixin, View):
-    @request_schema(UserTelegramIdSchema)
-    @response_schema(UserSchema)
-    async def get(self):
-        telegram_id = self.querystring.get("telegram_id", None)
-        user = await self.store.user_accessor.get_by_telegram_id(telegram_id)
-        return json_response(data=UserSchema().dump(user))
+class GameSessionSaveView(RoleRequiredMixin, View):
+    @request_schema(GameSessionRequestSchema)
+    @response_schema(GameSessionResponseSchema, 200)
+    async def post(self):
+        hash_base = get_hash_base(self.data)
+        session_hash = generate_session_hash(hash_base)
+
+        if await self.store.game_session_service.is_session_exists(session_hash):
+            raise HTTPConflict(text="Game session already exists")
+
+        await self.store.game_session_service.ensure_players_exist(
+            self.data["players"]
+        )
+        game_session = await self.store.game_session_accessor.save_game(
+            self.data, session_hash
+        )
+
+        return json_response(data=GameSessionResponseSchema().dump(game_session))

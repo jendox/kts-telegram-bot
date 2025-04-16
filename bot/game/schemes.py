@@ -10,6 +10,7 @@ class AnswerSchema(BaseSchema):
         model = Answer
         unknown = EXCLUDE
 
+    id = fields.Int(required=True)
     title = fields.Str(required=True)
     points = fields.Int(required=True)
 
@@ -19,6 +20,7 @@ class QuestionSchema(BaseSchema):
         model = Question
         unknown = EXCLUDE
 
+    id = fields.Int(required=True)
     title = fields.Str(required=True)
     answers = fields.Nested(AnswerSchema, required=True, many=True)
 
@@ -48,7 +50,7 @@ class GameSessionSchema(BaseSchema):
     players = fields.Nested(PlayerSchema, many=True, required=True)
     question = fields.Nested(QuestionSchema, allow_none=True)
     active_player = fields.Nested(PlayerSchema, allow_none=True)
-    given_answers = fields.List(fields.Str())
+    given_answers = fields.Nested(AnswerSchema, many=True, allow_none=True)
 
     def serialize_state(self, obj):
         return obj.state.name if obj.state else None

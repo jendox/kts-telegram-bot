@@ -42,6 +42,13 @@ class Messages:
         )
 
     @staticmethod
+    def answer_already_given(username: str) -> str:
+        return (
+            f"🤔 *{username}, ты прав(а), но такой ответ уже был!*\n"
+            "🎯 Попробуй угадать другой!"
+        )
+
+    @staticmethod
     def answer_wrong(username: str) -> str:
         return f"❌ *Увы! Неправильно.*\n" f"{username} выбывает из игры."
 
@@ -79,10 +86,10 @@ class Messages:
         """Создает текст для сообщения в телеграм"""
         lines = [f"🔹 Вопрос: {session.question.title}", "", "🔸 Ответы:"]
 
-        guessed_titles = [a.strip().capitalize() for a in session.given_answers]
+        guessed_titles = [a.title for a in session.given_answers]
 
         for i, answer in enumerate(session.question.answers, 1):
-            if answer.title.capitalize() in guessed_titles:
+            if answer.title in guessed_titles:
                 lines.append(f"{i}. 🟢 {answer.title} — {answer.points}")
             else:
                 lines.append(f"{i}. 🔴 ——————")

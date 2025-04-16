@@ -5,7 +5,6 @@ from logging import getLogger
 from bot.game.constants import (
     ANSWER_KEYBOARD,
     CALLBACK_DATA,
-    MIN_PLAYERS,
     START_MESSAGE,
     WAITING_TIME,
     GameCommand,
@@ -70,7 +69,7 @@ class GameManager:
             )
             session = await self.session_manager.get_session(chat_id)
 
-            if not session.active_player:
+            if session and not session.active_player:
                 GameEngine(session).assign_active_player(player)
                 await self.session_manager.set_session(session)
 
@@ -169,16 +168,6 @@ class GameManager:
             )
         )
 
-    async def _stop_game(self, session: GameSession):
-        session.set_finish_time()
-        await self.dsv_client.save_result()
-        await self.session_manager.clear_session(session.chat_id)
-        await self.tg.send_message(
-            MessageReply(
-                chat_id=session.chat_id, text=Messages.game_finished(session)
-            )
-        )
-
     async def _add_player(
         self, session: GameSession, user_id: int, username: str
     ):
@@ -188,6 +177,21 @@ class GameManager:
             MessageReply(
                 chat_id=session.chat_id,
                 text=Messages.player_joined(username, len(session.players)),
+            )
+        )
+
+    async def _prepare_session_and_save(self, session: GameSession):
+        engine = GameEngine(session)
+        engine.set_finish_time()
+        engine.clear_active_player()
+        await self.dsv_client.save_game(session)
+        await self.session_manager.clear_session(session.chat_id)
+
+    async def _stop_game(self, session: GameSession):
+        await self._prepare_session_and_save(session)
+        await self.tg.send_message(
+            MessageReply(
+                chat_id=session.chat_id, text=Messages.game_finished(session)
             )
         )
 
@@ -210,22 +214,41 @@ class GameManager:
             )
             await self.session_manager.clear_session(session.chat_id)
 
+    @staticmethod
+    def _handle_wrong_answer(session: GameSession) -> str:
+        GameEngine(session).eliminate_player(session.active_player.id)
+
+        return Messages.answer_wrong(session.get_active_player_name())
+
+    @staticmethod
+    def _build_already_answered_message(session: GameSession) -> str:
+        return Messages.answer_already_given(session.active_player.name)
+
+    @staticmethod
+    def _handle_correct_answer(session: GameSession, answer: str) -> str:
+        engine = GameEngine(session)
+        points = engine.award_points(session.active_player.id, answer)
+        engine.add_given_answer(answer)
+
+        return Messages.answer_correct(session.active_player.name, points)
+
     async def _process_answer(self, session: GameSession, answer: str):
         engine = GameEngine(session)
         if engine.is_answer_correct(answer):
-            points = engine.award_points(session.active_player.id, answer)
-            engine.add_given_answer(answer)
-            text = Messages.answer_correct(session.active_player.name, points)
+            if engine.is_already_answered(answer):
+                text = self._build_already_answered_message(session)
+            else:
+                text = self._handle_correct_answer(session, answer)
         else:
-            engine.eliminate_player(session.active_player.id)
-            text = Messages.answer_wrong(session.get_active_player_name())
+            text = self._handle_wrong_answer(session)
 
         engine.clear_active_player()
         await self.session_manager.set_session(session)
         await self.tg.send_message(
             MessageReply(
-                chat_id=engine.chat_id, text=text, reply_markup=ANSWER_KEYBOARD
+                chat_id=session.chat_id, text=text, reply_markup=ANSWER_KEYBOARD
             )
         )
-        if engine.count_active_players() < MIN_PLAYERS:
+
+        if not engine.is_game_continued():
             await self._stop_game(session)
