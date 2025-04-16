@@ -1,19 +1,16 @@
 from logging import getLogger
 
-from bot_manager.services.dataservice_client import DataServiceClient
-from bot_manager.game.manager import GameManager
+from bot.game.manager import GameManager
+from bot.services import DataServiceClient
 from shared.client.schemes import UpdateSchema
 from shared.client.telegram import TelegramClient
-from shared.client.types import MessageReply, Message, CallbackQuery, CallbackQueryReply
-from shared.storage.redis import RedisStorage
+from shared.client.types import CallbackQuery, CallbackQueryReply, Message
+from shared.storage import Storage
 
 
 class Dispatcher:
     def __init__(
-            self,
-            tg: TelegramClient,
-            dsv: DataServiceClient,
-            storage: RedisStorage
+        self, tg: TelegramClient, dsv: DataServiceClient, storage: Storage
     ):
         self.logger = getLogger(self.__class__.__name__)
         self.tg = tg
@@ -28,9 +25,7 @@ class Dispatcher:
             if update.message is not None:
                 await self._handle_message(update.message)
             elif update.callback_query is not None:
-                await self._handle_callback(
-                    update.callback_query
-                )
+                await self._handle_callback(update.callback_query)
             else:
                 raise ValueError("Unsupported updates type")
         except Exception as e:

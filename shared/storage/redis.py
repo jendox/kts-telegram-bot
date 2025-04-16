@@ -1,9 +1,12 @@
-import os
 from functools import wraps
 from logging import getLogger
 
 import redis
 from redis.asyncio import ConnectionPool, Redis
+
+from shared.storage.base import Storage
+
+__all__ = ("RedisStorage",)
 
 
 def check_client_connection(func):
@@ -16,10 +19,10 @@ def check_client_connection(func):
     return wrapper
 
 
-class RedisStorage:
+class RedisStorage(Storage):
     def __init__(self, url: str):
+        super().__init__(url)
         self.logger = getLogger(self.__class__.__name__)
-        self.url = url
         self._pool: ConnectionPool | None = None
         self._client: Redis | None = None
 
@@ -52,10 +55,7 @@ class RedisStorage:
     async def get(self, name: str, key: str) -> str | None:
         try:
             value = await self._client.hget(name, key)
-            if value is not None:
-                return value.decode()
-            else:
-                return None
+            return value.decode() if value is not None else value
         except redis.exceptions.RedisError as e:
             self.logger.error("Error getting value from Redis: %s", str(e))
             raise

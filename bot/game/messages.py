@@ -1,18 +1,18 @@
-from bot_manager.game.types import GameSession
+from bot.game.types import GameSession
 
 
 class Messages:
     @staticmethod
     def game_created(username: str, wait_time: int) -> str:
         return (
-            f"🎲 *Новая игра!* @{username} начал(а) игру\n"
+            f"🎲 *Новая игра!* {username} начал(а) игру\n"
             f"⏳ Ждем игроков *{wait_time} секунд*..."
         )
 
     @staticmethod
     def player_joined(username: str, total_players: int) -> str:
         return (
-            f"➕ *@{username}* присоединился(лась) к игре\n"
+            f"➕ *{username}* присоединился(лась) к игре\n"
             f"👥 Всего игроков: *{total_players}*"
         )
 
@@ -26,33 +26,37 @@ class Messages:
     @staticmethod
     def player_pressed_first(username: str) -> str:
         return (
-            f"⚡️ *@{username}* нажал(а) кнопку первым!\n"
+            f"⚡️ *{username}* нажал(а) кнопку первым!\n"
             f"💬 Сейчас он(а) отвечает."
         )
 
     @staticmethod
     def waiting_for_answer(username: str) -> str:
-        return f"⏳ *Ждем ответ от @{username}...*"
+        return f"⏳ *Ждем ответ от {username}...*"
 
     @staticmethod
     def answer_correct(username: str, points: int) -> str:
         return (
-            f"✅ *Верно!* @{username} получает *{points} очков* 👏\n"
+            f"✅ *Верно!* {username} получает *{points} очков* 👏\n"
             "Продолжаем игру!"
         )
 
     @staticmethod
     def answer_wrong(username: str) -> str:
-        return (
-            f"❌ *Увы! Неправильно.*\n"
-            f"@{username} выбывает из игры."
-        )
+        return f"❌ *Увы! Неправильно.*\n" f"{username} выбывает из игры."
 
     @staticmethod
     def not_enough_players() -> str:
         return (
-            "😕 *Недостаточно игроков для начала игры.*\n"
-            "🚫 Игра отменена."
+            "😕 *Недостаточно игроков для начала игры.*\n" "🚫 Игра отменена."
+        )
+
+    @staticmethod
+    def question_fetch_failed() -> str:
+        return (
+            "❗️ *Не удалось начать игру.*\n"
+            "😕 Произошла ошибка при получении вопроса.\n"
+            "🔁 Попробуйте еще раз через несколько секунд."
         )
 
     @staticmethod
@@ -85,8 +89,18 @@ class Messages:
 
         lines.append("")
         lines.append("👥 Игроки:")
-        for player in sorted(session.players, key=lambda p: p.points, reverse=True):
-            lines.append(f"• @{player.name}: {player.points} очков")
+        # for player in sorted(
+        #     session.players, key=lambda p: p.points, reverse=True
+        # ):
+        #     lines.append(f"• {player.name}: {player.points} очков")
+        lines.extend(
+            [
+                f"• {player.name}: {player.points} очков"
+                for player in sorted(
+                    session.players, key=lambda p: p.points, reverse=True
+                )
+            ]
+        )
 
         return "\n".join(lines)
 

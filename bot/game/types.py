@@ -1,8 +1,8 @@
 import datetime
 from dataclasses import dataclass, field
 
-from bot_manager.core.fsm import State
-from bot_manager.game.constatnts import GameState, MIN_PLAYERS
+from bot.core.fsm import State
+from bot.game.constants import MIN_PLAYERS, GameState
 
 
 @dataclass
@@ -59,7 +59,9 @@ class GameSession:
 
     def _find_answer(self, text: str) -> Answer | None:
         normalized = self._normalize(text)
-        return next((a for a in self.question.answers if a.title == normalized), None)
+        return next(
+            (a for a in self.question.answers if a.title == normalized), None
+        )
 
     def points_by_answer(self, text: str) -> int:
         answer = self._find_answer(text)
@@ -92,3 +94,6 @@ class GameSession:
 
     def count_active_players(self) -> int:
         return sum(p.is_active for p in self.players)
+
+    def set_finish_time(self):
+        self.finished_at = datetime.datetime.now()

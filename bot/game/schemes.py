@@ -1,7 +1,7 @@
 from marshmallow import EXCLUDE, fields
 
-from bot_manager.core.fsm import State
-from bot_manager.game.types import Answer, Question, Player, GameSession
+from bot.core.fsm import State
+from bot.game.types import Answer, GameSession, Player, Question
 from shared.client.schemes.base import BaseSchema
 
 
@@ -41,7 +41,7 @@ class GameSessionSchema(BaseSchema):
     state = fields.Method(
         required=True,
         serialize="serialize_state",
-        deserialize="deserialize_state"
+        deserialize="deserialize_state",
     )
     created_at = fields.DateTime(allow_none=True)
     finished_at = fields.DateTime(allow_none=True)

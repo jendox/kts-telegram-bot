@@ -1,11 +1,11 @@
 import enum
 
-from bot_manager.core.fsm import StateGroups, State
+from bot.core.fsm import State, StateGroups
 from shared.client.schemes.keyboard import InlineKeyboardMarkupSchema
 
 CALLBACK_DATA = "answer"
-WAITING_TIME = 5
-MIN_PLAYERS = 1
+WAITING_TIME = 10
+MIN_PLAYERS = 2
 
 
 class GameState(StateGroups):
@@ -48,8 +48,8 @@ START_MESSAGE = """
 
 ANSWER_KEYBOARD = InlineKeyboardMarkupSchema().load(
     {
-        "inline_keyboard": [[
-            {"text": "Ответить", "callback_data": CALLBACK_DATA}
-        ]]
+        "inline_keyboard": [
+            [{"text": "Ответить", "callback_data": CALLBACK_DATA}]
+        ]
     }
 )

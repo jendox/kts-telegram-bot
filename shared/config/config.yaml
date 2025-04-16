@@ -1,3 +1,5 @@
 broker:
   type: rabbitmq
   queue: tg_updates
+storage:
+  type: redis

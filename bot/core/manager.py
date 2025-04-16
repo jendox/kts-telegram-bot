@@ -2,13 +2,13 @@ import asyncio
 import os
 from logging import getLogger
 
-from bot_manager.services.dataservice_client import DataServiceClient
-from bot_manager.core.dispatcher import Dispatcher
-from bot_manager.services.poller import BotPoller
+from bot.core.dispatcher import Dispatcher
+from bot.services import DataServiceClient
+from bot.services import BotPoller
 from shared.client.telegram import TelegramClient
 from shared.config import Config
 from shared.poller import Poller
-from shared.storage.redis import RedisStorage
+from shared.storage import Storage, get_storage
 
 
 class BotManager:
@@ -19,7 +19,7 @@ class BotManager:
         self.dispatcher: Dispatcher | None = None
         self.tg_client: TelegramClient | None = None
         self.dsv_client: DataServiceClient | None = None
-        self.storage: RedisStorage | None = None
+        self.storage: Storage | None = None
         self._shutdown_event: asyncio.Event | None = None
 
     async def start(self):
@@ -57,7 +57,7 @@ class BotManager:
         await self.dsv_client.start()
 
     async def _start_storage(self):
-        self.storage = RedisStorage(os.getenv("REDIS_URL"))
+        self.storage = get_storage(self.config.storage.type)
         await self.storage.start()
 
     async def waiting_for_shutdown(self) -> None:

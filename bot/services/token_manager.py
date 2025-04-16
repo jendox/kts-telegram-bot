@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from jose import jwt
 from jose.constants import ALGORITHMS
 
+__all__ = ("TokenManager",)
+
 
 class TokenManager:
     def __init__(self, secret: str, renew_every: int = 300):

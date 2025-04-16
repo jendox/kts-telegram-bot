@@ -2,7 +2,7 @@ import asyncio
 import logging
 from logging import getLogger
 
-from bot_manager.core.manager import BotManager
+from bot.core.manager import BotManager
 from shared.config import load_config
 
 logger = getLogger(__name__)

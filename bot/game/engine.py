@@ -1,5 +1,5 @@
-from bot_manager.game.constatnts import GameState
-from bot_manager.game.types import Question, GameSession, Player
+from bot.game.constants import GameState
+from bot.game.types import GameSession, Player, Question
 
 
 class GameEngine:
@@ -23,8 +23,10 @@ class GameEngine:
         self._session.state = GameState.WAITING_FOR_PUSH_BUTTON
 
     def is_active_player(self, player_id: int) -> bool:
-        return (self._session.active_player
-                and self._session.active_player.id == player_id)
+        return (
+                self._session.active_player
+                and self._session.active_player.id == player_id
+        )
 
     def award_points(self, player_id: int, text: str) -> int:
         points = self._session.points_by_answer(text)

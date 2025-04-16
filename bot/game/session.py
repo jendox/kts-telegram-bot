@@ -1,14 +1,14 @@
 import datetime
 
-from bot_manager.core.fsm import FSM
-from bot_manager.game.constatnts import GameState
-from bot_manager.game.schemes import GameSessionSchema
-from bot_manager.game.types import GameSession, Player
-from shared.storage.redis import RedisStorage
+from bot.core.fsm import FSM
+from bot.game.constants import GameState
+from bot.game.schemes import GameSessionSchema
+from bot.game.types import GameSession, Player
+from shared.storage import Storage
 
 
 class SessionManager:
-    def __init__(self, storage: RedisStorage):
+    def __init__(self, storage: Storage):
         self.fsm = FSM(storage)
 
     async def new_session(self, chat_id: int, user_id: int, username: str):
@@ -22,7 +22,7 @@ class SessionManager:
             chat_id=chat_id,
             state=GameState.WAITING_FOR_PLAYERS,
             created_at=datetime.datetime.now(),
-            players=[Player(user_id, username)]
+            players=[Player(user_id, username)],
         )
         await self.set_session(session)
 
@@ -33,7 +33,7 @@ class SessionManager:
         Returns:
             GameSession | None
         """
-        data = await self.fsm.get_data(chat_id)
+        data = await self.fsm.get_state(chat_id)
         return GameSessionSchema().load(data) if data else None
 
     async def set_session(self, session: GameSession) -> None:
@@ -42,7 +42,7 @@ class SessionManager:
             session: данные сессии
         """
         data = GameSessionSchema().dump(session)
-        await self.fsm.set_data(session.chat_id, data)
+        await self.fsm.set_state(session.chat_id, data)
 
     async def clear_session(self, chat_id: int) -> None:
         """Сбрасывает игровую сессию
