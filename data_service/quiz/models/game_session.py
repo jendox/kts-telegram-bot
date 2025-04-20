@@ -13,7 +13,9 @@ from data_service.store.database.sqlalchemy_base import (
 class Player(BaseModel):
     __tablename__ = "players"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=False
+    )
     name: Mapped[str] = mapped_column(nullable=True)
     game_session_assoc: Mapped[list["PlayerGameSession"]] = relationship(
         "PlayerGameSession",
@@ -26,6 +28,7 @@ class GameSession(BaseModel):
     __tablename__ = "game_sessions"
 
     id: Mapped[prim_inc_an]
+    chat_id: Mapped[int] = mapped_column(BigInteger)
     created_at: Mapped[datetime]
     finished_at: Mapped[datetime]
     question_id: Mapped[int] = mapped_column(
@@ -39,10 +42,14 @@ class GameSession(BaseModel):
         cascade="all, delete-orphan",
     )
     given_answers_assoc: Mapped[list["GameSessionAnswer"]] = relationship(
-        "GameSessionAnswer", back_populates="game_session", cascade="all, delete-orphan"
+        "GameSessionAnswer",
+        back_populates="game_session",
+        cascade="all, delete-orphan",
     )
 
-    session_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    session_hash: Mapped[str] = mapped_column(
+        String(64), unique=True, nullable=False
+    )
 
     __table_args__ = (
         UniqueConstraint("session_hash", name="uq_game_session_hash"),
@@ -69,8 +76,14 @@ class GameSessionAnswer(BaseModel):
     __tablename__ = "game_session_answers"
 
     id: Mapped[prim_inc_an]
-    game_session_id: Mapped[int] = mapped_column(ForeignKey("game_sessions.id", ondelete="CASCADE"))
-    answer_id: Mapped[int] = mapped_column(ForeignKey("answers.id", ondelete="CASCADE"))
+    game_session_id: Mapped[int] = mapped_column(
+        ForeignKey("game_sessions.id", ondelete="CASCADE")
+    )
+    answer_id: Mapped[int] = mapped_column(
+        ForeignKey("answers.id", ondelete="CASCADE")
+    )
 
-    game_session: Mapped["GameSession"] = relationship("GameSession", back_populates="given_answers_assoc")
+    game_session: Mapped["GameSession"] = relationship(
+        "GameSession", back_populates="given_answers_assoc"
+    )
     answer: Mapped["Answer"] = relationship("Answer")

@@ -1,6 +1,6 @@
 import json
 
-from aiohttp.web_exceptions import HTTPConflict, HTTPInternalServerError
+from aiohttp.web_exceptions import HTTPConflict, HTTPInternalServerError, HTTPNotFound
 from aiohttp_apispec import request_schema, response_schema
 from sqlalchemy.exc import IntegrityError
 
@@ -8,9 +8,12 @@ from data_service.quiz.schemes import (
     ListQuestionSchema,
     QuestionDeleteSchema,
     QuestionSchema,
-    GameSessionRequestSchema, GameSessionResponseSchema,
+    GameSessionSaveRequestSchema,
+    GameSessionSaveResponseSchema,
+    LastGameSessionResponseSchema,
+    LastGameSessionRequestSchema,
 )
-from data_service.quiz.utils import generate_session_hash, get_hash_base
+from data_service.quiz.utils import generate_session_hash, get_session_hash_base
 from data_service.web.app import View
 from data_service.web.decorators import required_roles
 from data_service.web.jwt_utils import UserRole
@@ -63,13 +66,15 @@ class QuestionRandomView(RoleRequiredMixin, View):
 
 @required_roles(UserRole.ADMIN, UserRole.BOT)
 class GameSessionSaveView(RoleRequiredMixin, View):
-    @request_schema(GameSessionRequestSchema)
-    @response_schema(GameSessionResponseSchema, 200)
+    @request_schema(GameSessionSaveRequestSchema)
+    @response_schema(GameSessionSaveResponseSchema, 200)
     async def post(self):
-        hash_base = get_hash_base(self.data)
+        hash_base = get_session_hash_base(self.data)
         session_hash = generate_session_hash(hash_base)
 
-        if await self.store.game_session_service.is_session_exists(session_hash):
+        if await self.store.game_session_service.is_session_exists(
+                session_hash
+        ):
             raise HTTPConflict(text="Game session already exists")
 
         await self.store.game_session_service.ensure_players_exist(
@@ -79,4 +84,21 @@ class GameSessionSaveView(RoleRequiredMixin, View):
             self.data, session_hash
         )
 
-        return json_response(data=GameSessionResponseSchema().dump(game_session))
+        return json_response(
+            data=GameSessionSaveResponseSchema().dump(game_session)
+        )
+
+
+@required_roles(UserRole.ADMIN, UserRole.BOT)
+class LastGameSessionView(RoleRequiredMixin, View):
+    @request_schema(LastGameSessionRequestSchema, location="querystring")
+    @response_schema(LastGameSessionResponseSchema, 200)
+    async def get(self):
+        game_session = await self.store.game_session_accessor.get_last_session(
+            self.data.get("chat_id")
+        )
+        if not game_session:
+            raise HTTPNotFound(text="There is no finished games in this chat yet")
+        return json_response(
+            data=LastGameSessionResponseSchema().dump(game_session)
+        )

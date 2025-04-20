@@ -55,9 +55,6 @@ async def error_handling_middleware(request: "Request", handler):
 
 @middleware
 async def auth_middleware(request: "Request", handler):
-    # session = await get_session(request)
-    # request.admin = Admin.from_session(session)
-    # return await handler(request)
     request.actor = None
 
     auth = request.headers.get("Authorization", "")
@@ -65,7 +62,6 @@ async def auth_middleware(request: "Request", handler):
         token = auth.removeprefix("Bearer ").strip()
         payload = decode_jwt(token)
         if payload:
-            # request.actor = payload
             request.actor = {
                 "role": UserRole(payload.get("role"))
                 if payload.get("role")

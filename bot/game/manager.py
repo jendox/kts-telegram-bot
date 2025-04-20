@@ -30,7 +30,7 @@ class GameManager:
         self.dsv_client = dsv
         self.session_manager = SessionManager(storage)
         self.waiting_timers = {}
-        self.handlers: dict[
+        self.command_handlers: dict[
             GameCommand, Callable[[Message], Awaitable[None]]
         ] = {
             GameCommand.START: self._handle_start,
@@ -82,8 +82,8 @@ class GameManager:
 
     async def _process_command(self, message: Message):
         command = GameCommand.from_string(extract_command(message))
-        if command and command in self.handlers:
-            await self.handlers[command](message)
+        if command and command in self.command_handlers:
+            await self.command_handlers[command](message)
 
     async def _handle_start(self, message: Message):
         await self.tg.send_message(

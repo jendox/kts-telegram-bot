@@ -3,10 +3,15 @@ from marshmallow import (
     ValidationError,
     fields,
     validates,
-    EXCLUDE, post_load,
+    EXCLUDE,
+    post_load,
 )
 
-from data_service.quiz.models import GameSession, GameSessionAnswer, PlayerGameSession
+from data_service.quiz.models import (
+    GameSession,
+    GameSessionAnswer,
+    PlayerGameSession,
+)
 
 
 class AnswerSchema(Schema):
@@ -60,10 +65,11 @@ class RawDateTimeField(fields.DateTime):
         return value
 
 
-class GameSessionRequestSchema(Schema):
+class GameSessionSaveRequestSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
+    chat_id = fields.Int(required=True)
     created_at = RawDateTimeField(required=True)
     finished_at = RawDateTimeField(required=True)
     question = fields.Nested(QuestionSchema, required=True)
@@ -71,7 +77,7 @@ class GameSessionRequestSchema(Schema):
     players = fields.Nested(PlayerSchema, many=True)
 
 
-class GameSessionResponseSchema(Schema):
+class GameSessionSaveResponseSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
@@ -82,6 +88,7 @@ class GameSessionSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
+    chat_id = fields.Int(required=True)
     created_at = fields.DateTime(required=True)
     finished_at = fields.DateTime(required=True)
     question = fields.Nested(QuestionSchema, required=True)
@@ -95,6 +102,7 @@ class GameSessionSchema(Schema):
         question = data.pop("question")
 
         return GameSession(
+            chat_id = data["chat_id"],
             created_at=data["created_at"],
             finished_at=data["finished_at"],
             question_id=question["id"],
@@ -102,6 +110,36 @@ class GameSessionSchema(Schema):
                 GameSessionAnswer(answer_id=a["id"]) for a in given_answers
             ],
             player_assoc=[
-                PlayerGameSession(player_id=p["id"], points=p["points"]) for p in players
+                PlayerGameSession(player_id=p["id"], points=p["points"])
+                for p in players
             ],
         )
+
+
+class PlayerGameSessionSchema(Schema):
+    player = fields.Nested(PlayerSchema)
+    points = fields.Int()
+
+
+class GameSessionAnswerSchema(Schema):
+    answer = fields.Nested(AnswerSchema)
+
+
+class QuestionTitleSchema(Schema):
+    title = fields.Str(required=True)
+
+
+class LastGameSessionRequestSchema(Schema):
+    chat_id = fields.Int(required=True)
+
+
+class LastGameSessionResponseSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    created_at = fields.DateTime()
+    finished_at = fields.DateTime()
+    question = fields.Nested(QuestionTitleSchema)
+    players = fields.List(
+        fields.Nested(PlayerGameSessionSchema), attribute="player_assoc"
+    )
