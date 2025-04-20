@@ -5,8 +5,8 @@ from sqlalchemy.orm import joinedload
 
 from data_service.quiz.models import (
     GameSession,
-    Question,
     PlayerGameSession,
+    Question,
 )
 from data_service.quiz.schemes import GameSessionSchema
 from data_service.store.repositories.base_repo import BaseRepository

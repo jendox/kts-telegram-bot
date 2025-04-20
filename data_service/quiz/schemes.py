@@ -1,10 +1,10 @@
 from marshmallow import (
+    EXCLUDE,
     Schema,
     ValidationError,
     fields,
-    validates,
-    EXCLUDE,
     post_load,
+    validates,
 )
 
 from data_service.quiz.models import (
@@ -58,10 +58,7 @@ class PlayerSchema(Schema):
 
 class RawDateTimeField(fields.DateTime):
     def _deserialize(self, value, attr, data, **kwargs):
-        try:
-            super()._deserialize(value, attr, data, **kwargs)
-        except ValidationError:
-            raise
+        super()._deserialize(value, attr, data, **kwargs)
         return value
 
 

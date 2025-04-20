@@ -3,9 +3,9 @@ import typing
 from data_service.store.admin.accessor import AdminAccessor
 from data_service.store.database import Database
 from data_service.store.quiz.accessor import (
-    QuestionAccessor,
     GameSessionAccessor,
     PlayerAccessor,
+    QuestionAccessor,
 )
 from data_service.store.quiz.services import GameSessionService
 

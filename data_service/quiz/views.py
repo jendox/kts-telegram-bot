@@ -9,13 +9,13 @@ from aiohttp_apispec import request_schema, response_schema
 from sqlalchemy.exc import IntegrityError
 
 from data_service.quiz.schemes import (
+    GameSessionSaveRequestSchema,
+    GameSessionSaveResponseSchema,
+    LastGameSessionRequestSchema,
+    LastGameSessionResponseSchema,
     ListQuestionSchema,
     QuestionDeleteSchema,
     QuestionSchema,
-    GameSessionSaveRequestSchema,
-    GameSessionSaveResponseSchema,
-    LastGameSessionResponseSchema,
-    LastGameSessionRequestSchema,
 )
 from data_service.quiz.utils import generate_session_hash, get_session_hash_base
 from data_service.web.app import View

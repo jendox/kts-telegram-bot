@@ -1,12 +1,12 @@
 import typing
 
 from data_service.quiz.views import (
+    GameSessionSaveView,
+    LastGameSessionView,
     QuestionAddView,
     QuestionDeleteView,
     QuestionListView,
     QuestionRandomView,
-    GameSessionSaveView,
-    LastGameSessionView,
 )
 
 if typing.TYPE_CHECKING:

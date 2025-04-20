@@ -95,6 +95,22 @@ services:
     env_file:
       - ../docker/env/data_service_docker.env
 
+  bot:
+    image: bot-image
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.bot
+    depends_on:
+      - poller
+      - web
+    networks:
+      - bot-net
+    env_file:
+      - ../docker/env/bot_docker.env
+      - ../docker/env/data_service_docker.env
+      - ../docker/env/broker_docker.env
+      - ../docker/env/tgclient.env
+
 volumes:
   rabbitmq_data:
   rabbitmq_log:
