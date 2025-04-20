@@ -30,6 +30,7 @@ class GameManager:
         self.dsv_client = dsv
         self.session_manager = SessionManager(storage)
         self.waiting_timers = {}
+
         self.command_handlers: dict[
             GameCommand, Callable[[Message], Awaitable[None]]
         ] = {
@@ -40,6 +41,7 @@ class GameManager:
         }
 
     async def process_message(self, message: Message):
+        chat_id = message.chat.id
         if message.entities is not None:
             try:
                 await self._process_command(message)
@@ -47,11 +49,10 @@ class GameManager:
                 self.logger.debug("Error: %s", str(e))
                 await self.tg.send_message(
                     MessageReply(
-                        message.chat.id, "Я пока не знаю такой команды..."
+                        chat_id=chat_id, text=Messages.unknown_command()
                     )
                 )
         else:
-            chat_id = message.chat.id
             user_id = message.from_.id
             session = await self.session_manager.get_session(chat_id)
             if (
