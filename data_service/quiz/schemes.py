@@ -102,7 +102,7 @@ class GameSessionSchema(Schema):
         question = data.pop("question")
 
         return GameSession(
-            chat_id = data["chat_id"],
+            chat_id=data["chat_id"],
             created_at=data["created_at"],
             finished_at=data["finished_at"],
             question_id=question["id"],
@@ -117,12 +117,9 @@ class GameSessionSchema(Schema):
 
 
 class PlayerGameSessionSchema(Schema):
-    player = fields.Nested(PlayerSchema)
+    id = fields.Int(attribute="player.id")
+    name = fields.Str(attribute="player.name")
     points = fields.Int()
-
-
-class GameSessionAnswerSchema(Schema):
-    answer = fields.Nested(AnswerSchema)
 
 
 class QuestionTitleSchema(Schema):
@@ -139,7 +136,7 @@ class LastGameSessionResponseSchema(Schema):
 
     created_at = fields.DateTime()
     finished_at = fields.DateTime()
-    question = fields.Nested(QuestionTitleSchema)
+    question = fields.Nested(QuestionSchema)
     players = fields.List(
         fields.Nested(PlayerGameSessionSchema), attribute="player_assoc"
     )

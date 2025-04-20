@@ -35,7 +35,7 @@ class GameManager:
         ] = {
             GameCommand.START: self._handle_start,
             GameCommand.JOIN: self._handle_join,
-            GameCommand.STATUS: self._handle_status,
+            GameCommand.STATISTICS: self._handle_status,
             GameCommand.STOP: self._handle_stop,
         }
 
@@ -69,7 +69,7 @@ class GameManager:
             )
             session = await self.session_manager.get_session(chat_id)
 
-            if session and not session.active_player:
+            if session and not session.current_player:
                 GameEngine(session).assign_active_player(player)
                 await self.session_manager.set_session(session)
 
@@ -117,7 +117,12 @@ class GameManager:
         if session and not session.is_game_state(GameState.WAITING_FOR_PLAYERS):
             text = Messages.game_status(session)
         else:
-            text = Messages.game_not_started()
+            session = await self.dsv_client.get_last_game(chat_id)
+            text = (
+                Messages.last_game_summary_message(session)
+                if session
+                else Messages.no_game_summary_message()
+            )
         await self.tg.send_message(MessageReply(chat_id=chat_id, text=text))
 
     async def _handle_stop(self, message: Message):
@@ -216,21 +221,21 @@ class GameManager:
 
     @staticmethod
     def _handle_wrong_answer(session: GameSession) -> str:
-        GameEngine(session).eliminate_player(session.active_player.id)
+        GameEngine(session).eliminate_player(session.current_player.id)
 
         return Messages.answer_wrong(session.get_active_player_name())
 
     @staticmethod
     def _build_already_answered_message(session: GameSession) -> str:
-        return Messages.answer_already_given(session.active_player.name)
+        return Messages.answer_already_given(session.current_player.name)
 
     @staticmethod
     def _handle_correct_answer(session: GameSession, answer: str) -> str:
         engine = GameEngine(session)
-        points = engine.award_points(session.active_player.id, answer)
+        points = engine.award_points(session.current_player.id, answer)
         engine.add_given_answer(answer)
 
-        return Messages.answer_correct(session.active_player.name, points)
+        return Messages.answer_correct(session.current_player.name, points)
 
     async def _process_answer(self, session: GameSession, answer: str):
         engine = GameEngine(session)

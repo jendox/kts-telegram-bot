@@ -4,8 +4,8 @@ from bot.core.fsm import State, StateGroups
 from shared.client.schemes.keyboard import InlineKeyboardMarkupSchema
 
 CALLBACK_DATA = "answer"
-WAITING_TIME = 3
-MIN_PLAYERS = 1
+WAITING_TIME = 10
+MIN_PLAYERS = 2
 
 
 class GameState(StateGroups):
@@ -17,7 +17,7 @@ class GameState(StateGroups):
 class GameCommand(enum.Enum):
     START = "start"
     JOIN = "join"
-    STATUS = "status"
+    STATISTICS = "statistics"
     STOP = "stop"
 
     @classmethod
@@ -40,7 +40,7 @@ START_MESSAGE = """
 
 🔘 Команды:
 • /join — присоединиться к игре
-• /status — посмотреть статус игры
+• /statistics — посмотреть статистику игры
 • /stop — завершить игру
 
 Удачи! 😉

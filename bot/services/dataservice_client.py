@@ -50,9 +50,11 @@ class DataServiceClient:
             url="/quiz.save_game", headers=headers, json=data
         )
 
-    async def get_last_game(self):
+    async def get_last_game(self, chat_id: int):
         headers = await self._headers()
-        result = await self.client.get(url="/quiz.last_game", headers=headers)
+        result = await self.client.get(
+            url=f"/quiz.last_game?chat_id={chat_id}", headers=headers
+        )
         if result.status == 200:
             data = await result.json()
             return GameSessionSchema().load(data["data"])

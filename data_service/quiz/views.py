@@ -1,6 +1,10 @@
 import json
 
-from aiohttp.web_exceptions import HTTPConflict, HTTPInternalServerError, HTTPNotFound
+from aiohttp.web_exceptions import (
+    HTTPConflict,
+    HTTPInternalServerError,
+    HTTPNotFound,
+)
 from aiohttp_apispec import request_schema, response_schema
 from sqlalchemy.exc import IntegrityError
 
@@ -73,7 +77,7 @@ class GameSessionSaveView(RoleRequiredMixin, View):
         session_hash = generate_session_hash(hash_base)
 
         if await self.store.game_session_service.is_session_exists(
-                session_hash
+            session_hash
         ):
             raise HTTPConflict(text="Game session already exists")
 
@@ -98,7 +102,9 @@ class LastGameSessionView(RoleRequiredMixin, View):
             self.data.get("chat_id")
         )
         if not game_session:
-            raise HTTPNotFound(text="There is no finished games in this chat yet")
+            raise HTTPNotFound(
+                text="There is no finished games in this chat yet"
+            )
         return json_response(
             data=LastGameSessionResponseSchema().dump(game_session)
         )

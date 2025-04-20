@@ -29,13 +29,13 @@ class Player:
 
 @dataclass
 class GameSession:
-    chat_id: int
+    chat_id: int = None
     state: State = field(default_factory=GameState)
     created_at: datetime.datetime = None
     finished_at: datetime.datetime = None
     players: list[Player] = field(default_factory=list)
     question: Question = None
-    active_player: Player = None
+    current_player: Player = None
     given_answers: list[Answer] = field(default_factory=list)
 
     def is_ready_to_start(self) -> bool:
@@ -46,7 +46,7 @@ class GameSession:
         return not player.is_active if player else True
 
     def get_active_player_name(self) -> str | None:
-        return self.active_player.name if self.active_player else None
+        return self.current_player.name if self.current_player else None
 
     def get_player_by_id(self, user_id: int) -> Player | None:
         return next((p for p in self.players if p.id == user_id), None)
@@ -91,8 +91,8 @@ class GameSession:
         player = self.get_player_by_id(user_id)
         if player:
             player.is_active = False
-        if self.active_player and self.active_player.id == user_id:
-            self.active_player = None
+        if self.current_player and self.current_player.id == user_id:
+            self.current_player = None
 
     def count_active_players(self) -> int:
         return sum(p.is_active for p in self.players)
@@ -102,3 +102,11 @@ class GameSession:
 
     def set_finish_time(self):
         self.finished_at = datetime.datetime.now()
+
+
+@dataclass
+class LastGameSession:
+    created_at: datetime.datetime = None
+    finished_at: datetime.datetime = None
+    players: list[Player] = field(default_factory=list)
+    question: Question = None

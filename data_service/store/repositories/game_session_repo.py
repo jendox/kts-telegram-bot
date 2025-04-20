@@ -7,7 +7,6 @@ from data_service.quiz.models import (
     GameSession,
     Question,
     PlayerGameSession,
-    GameSessionAnswer,
 )
 from data_service.quiz.schemes import GameSessionSchema
 from data_service.store.repositories.base_repo import BaseRepository
@@ -35,10 +34,10 @@ class GameSessionRepository(BaseRepository):
             .where(GameSession.chat_id == chat_id)
             .order_by(GameSession.finished_at.desc())
             .options(
-                joinedload(GameSession.question),
+                joinedload(GameSession.question).joinedload(Question.answers),
                 joinedload(GameSession.player_assoc).joinedload(
                     PlayerGameSession.player
-                )
+                ),
             )
             .limit(1)
         )

@@ -80,20 +80,20 @@ services:
       - ../docker/env/tgclient.env
       - ../docker/env/broker_docker.env
 
-#  web:
-#    image: web-image
-#    build:
-#      context: ..
-#      dockerfile: docker/Dockerfile.dataservice
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#    networks:
-#      - bot-net
-#    env_file:
-#      - ../docker/env/data_service_docker.env
+  web:
+    image: web-image
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dataservice
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bot-net
+    env_file:
+      - ../docker/env/data_service_docker.env
 
 volumes:
   rabbitmq_data:

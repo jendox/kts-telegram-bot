@@ -15,17 +15,17 @@ class GameEngine:
         self._session.state = GameState.WAITING_FOR_PUSH_BUTTON
 
     def assign_active_player(self, player: Player):
-        self._session.active_player = player
+        self._session.current_player = player
         self._session.state = GameState.WAITING_FOR_ANSWER
 
     def clear_active_player(self):
-        self._session.active_player = None
+        self._session.current_player = None
         self._session.state = GameState.WAITING_FOR_PUSH_BUTTON
 
     def is_active_player(self, player_id: int) -> bool:
         return (
-            self._session.active_player
-            and self._session.active_player.id == player_id
+            self._session.current_player
+            and self._session.current_player.id == player_id
         )
 
     def award_points(self, player_id: int, text: str) -> int:

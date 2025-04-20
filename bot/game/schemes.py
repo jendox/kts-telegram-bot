@@ -32,16 +32,15 @@ class PlayerSchema(BaseSchema):
     id = fields.Int(required=True)
     name = fields.Str(required=True)
     points = fields.Int(required=True)
-    is_active = fields.Bool(required=True)
+    is_active = fields.Bool()
 
 
 class GameSessionSchema(BaseSchema):
     class Meta:
         model = GameSession
 
-    chat_id = fields.Int(required=True)
+    chat_id = fields.Int()
     state = fields.Method(
-        required=True,
         serialize="serialize_state",
         deserialize="deserialize_state",
     )
@@ -49,7 +48,7 @@ class GameSessionSchema(BaseSchema):
     finished_at = fields.DateTime(allow_none=True)
     players = fields.Nested(PlayerSchema, many=True, required=True)
     question = fields.Nested(QuestionSchema, allow_none=True)
-    active_player = fields.Nested(PlayerSchema, allow_none=True)
+    current_player = fields.Nested(PlayerSchema, allow_none=True)
     given_answers = fields.Nested(AnswerSchema, many=True, allow_none=True)
 
     def serialize_state(self, obj):

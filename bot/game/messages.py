@@ -112,6 +112,38 @@ class Messages:
         return "\n".join(lines)
 
     @staticmethod
+    def last_game_summary_message(session: GameSession) -> str:
+        start = session.created_at.strftime("%H:%M:%S")
+        end = session.finished_at.strftime("%H:%M:%S")
+
+        lines = [
+            "📊 *Результат последней игры в этом чате*",
+            "",
+            f"🧠 *Вопрос:* {session.question.title}",
+            "",
+            f"🕰 *Игра началась:* {start}",
+            f"🏁 *Игра завершена:* {end}",
+            "",
+            "🏆 *Результаты:*",
+        ]
+
+        sorted_players = sorted(
+            session.players, key=lambda p: p.points, reverse=True
+        )
+
+        for i, player in enumerate(sorted_players, 1):
+            lines.append(f"{i}. *{player.name}* — {player.points} очков")
+
+        return "\n".join(lines)
+
+    @staticmethod
+    def no_game_summary_message() -> str:
+        return (
+            "😕 В этом чате ещё не проводились игры.\n"
+            "🎮 Нажмите /join, чтобы начать первую!"
+        )
+
+    @staticmethod
     def game_not_started() -> str:
         return (
             "🕓 *Игра ещё не началась.*\n"
