@@ -12,6 +12,9 @@ class State:
     def __eq__(self, other):
         return isinstance(other, State) and self.name == other.name
 
+    def __hash__(self):
+        return super().__hash__()
+
     def __str__(self):
         return self.name
 
