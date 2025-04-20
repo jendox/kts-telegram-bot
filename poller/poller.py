@@ -10,15 +10,14 @@ from shared.broker import BrokerType, MessageBroker, get_broker
 from shared.client.telegram import TelegramClient
 from shared.poller import Poller
 
-LOGGER_NAME = "telegram_poller"
-POLL_TIMEOUT = 10
+POLL_TIMEOUT = 20
 
 __all__ = ("TelegramPoller",)
 
 
 class TelegramPoller(Poller):
     def __init__(self, broker_type: BrokerType):
-        self.logger = getLogger(LOGGER_NAME)
+        self.logger = getLogger(self.__class__.__name__)
         self.broker_type = broker_type
         self.client: TelegramClient | None = None
         self.broker: MessageBroker | None = None

@@ -11,7 +11,6 @@ from shared.decorators import retry_async
 
 __all__ = ("RabbitMQBroker",)
 
-LOGGER_NAME = "rabbitmq"
 DEFAULT_URL = "amqp://guest:guest@127.0.0.1/"
 DEFAULT_QUEUE_NAME = "tg_updates"
 MESSAGE_ENCODING = "utf-8"
@@ -19,7 +18,7 @@ MESSAGE_ENCODING = "utf-8"
 
 class RabbitMQBroker(MessageBroker):
     def __init__(self):
-        self.logger = getLogger(LOGGER_NAME)
+        self.logger = getLogger(self.__class__.__name__)
         self.url = os.getenv("RABBITMQ_URL", default=DEFAULT_URL)
         self.queue_name = os.getenv(
             "RABBITMQ_QUEUE_NAME", default=DEFAULT_QUEUE_NAME

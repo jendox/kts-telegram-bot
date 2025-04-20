@@ -14,7 +14,7 @@ from data_service.quiz.schemes import (
     LastGameSessionRequestSchema,
     LastGameSessionResponseSchema,
     ListQuestionSchema,
-    QuestionDeleteSchema,
+    QuestionIdRequestSchema,
     QuestionSchema,
 )
 from data_service.quiz.utils import generate_session_hash, get_session_hash_base
@@ -44,7 +44,7 @@ class QuestionAddView(RoleRequiredMixin, View):
 
 @required_roles(UserRole.ADMIN)
 class QuestionDeleteView(RoleRequiredMixin, View):
-    @request_schema(QuestionDeleteSchema)
+    @request_schema(QuestionIdRequestSchema)
     async def post(self):
         await self.store.question_accessor.delete_question(self.data["id"])
         return json_response()

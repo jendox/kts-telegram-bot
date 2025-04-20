@@ -43,7 +43,7 @@ class ListQuestionSchema(Schema):
     questions = fields.Nested(QuestionSchema, many=True)
 
 
-class QuestionDeleteSchema(Schema):
+class QuestionIdRequestSchema(Schema):
     id = fields.Int(required=True)
 
 

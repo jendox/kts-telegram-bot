@@ -27,7 +27,7 @@ class BaseAccessor:
         **kwargs,
     ):
         self.app = app
-        self.logger = getLogger(f"{self.__class__.__name__}")
+        self.logger = getLogger(self.__class__.__name__)
         self.session_factory: Callable[[], "AsyncSession"] | None = None
 
         app.on_startup.append(self.connect)
