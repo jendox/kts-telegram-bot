@@ -91,8 +91,6 @@ class GameSession:
         player = self.get_player_by_id(user_id)
         if player:
             player.is_active = False
-        if self.current_player and self.current_player.id == user_id:
-            self.current_player = None
 
     def count_active_players(self) -> int:
         return sum(p.is_active for p in self.players)
