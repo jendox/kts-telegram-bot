@@ -24,10 +24,11 @@ class Messages:
         )
 
     @staticmethod
-    def player_pressed_first(username: str) -> str:
+    def player_pressed_first(username: str, seconds: int) -> str:
         return (
             f"⚡️ *{username}* нажал(а) кнопку первым!\n"
-            f"💬 Сейчас он(а) отвечает."
+            f"💬 Сейчас он(а) отвечает.\n"
+            f"⏳ На ответ {seconds} секунд."
         )
 
     @staticmethod
@@ -51,6 +52,10 @@ class Messages:
     @staticmethod
     def answer_wrong(username: str) -> str:
         return f"❌ *Увы! Неправильно.*\n" f"{username} выбывает из игры."
+
+    @staticmethod
+    def answer_time_run_out(username: str) -> str:
+        return f"❌ *Увы! Закончилось время для ответа.*\n" f"{username} выбывает из игры."
 
     @staticmethod
     def not_enough_players() -> str:

@@ -53,8 +53,10 @@ class GameEngine:
         self._session.set_finish_time()
 
     def is_game_continued(self):
+        active_players = self.count_active_players()
         return (
-            self.count_active_players() >= MIN_PLAYERS - 1
+            active_players > 0
+            and active_players >= MIN_PLAYERS - 1
             and self._session.count_given_answers()
             < len(self._session.question.answers)
         )

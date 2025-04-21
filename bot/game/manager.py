@@ -1,4 +1,5 @@
 import asyncio
+from asyncio import Task
 from collections.abc import Awaitable, Callable
 from logging import getLogger
 
@@ -6,9 +7,9 @@ from bot.game.constants import (
     ANSWER_KEYBOARD,
     CALLBACK_DATA,
     START_MESSAGE,
-    WAITING_TIME,
+    PLAYERS_WAITING_TIME,
     GameCommand,
-    GameState,
+    GameState, ANSWER_WAITING_TIME,
 )
 from bot.game.engine import GameEngine
 from bot.game.messages import Messages
@@ -29,7 +30,7 @@ class GameManager:
         self.tg = tg
         self.dsv_client = dsv
         self.session_manager = SessionManager(storage)
-        self.waiting_timers = {}
+        self.waiting_timers: dict[int, Task] = {}
 
         self.command_handlers: dict[
             GameCommand, Callable[[Message], Awaitable[None]]
@@ -74,12 +75,28 @@ class GameManager:
                 GameEngine(session).assign_active_player(player)
                 await self.session_manager.set_session(session)
 
+                task = asyncio.create_task(self._wait_for_answer(session))
+                self.waiting_timers[chat_id] = task
+
                 await self.tg.send_message(
                     MessageReply(
                         chat_id=chat_id,
-                        text=Messages.player_pressed_first(player.name),
+                        text=Messages.player_pressed_first(player.name, ANSWER_WAITING_TIME),
                     )
                 )
+
+    async def _wait_for_answer(self, session: GameSession):
+        await asyncio.sleep(ANSWER_WAITING_TIME)
+        username = session.current_player.name
+        self._handle_wrong_answer(session)
+        await self._prepare_next_step(session)
+        await self.tg.send_message(
+            MessageReply(
+                chat_id=session.chat_id,
+                text=Messages.answer_time_run_out(username),
+            )
+        )
+        await self._check_game_status(session)
 
     async def _process_command(self, message: Message):
         command = GameCommand.from_string(extract_command(message))
@@ -170,7 +187,7 @@ class GameManager:
         await self.tg.send_message(
             MessageReply(
                 chat_id=chat_id,
-                text=Messages.game_created(username, WAITING_TIME),
+                text=Messages.game_created(username, PLAYERS_WAITING_TIME),
             )
         )
 
@@ -202,7 +219,7 @@ class GameManager:
         )
 
     async def _wait_and_start(self, chat_id: int):
-        await asyncio.sleep(WAITING_TIME)
+        await asyncio.sleep(PLAYERS_WAITING_TIME)
         session = await self.session_manager.get_session(chat_id)
 
         if session is None or not session.is_game_state(
@@ -238,8 +255,17 @@ class GameManager:
 
         return Messages.answer_correct(session.current_player.name, points)
 
+    async def _prepare_next_step(self, session: GameSession):
+        GameEngine(session).clear_active_player()
+        await self.session_manager.set_session(session)
+
+    async def _check_game_status(self, session: GameSession):
+        if not GameEngine(session).is_game_continued():
+            await self._stop_game(session)
+
     async def _process_answer(self, session: GameSession, answer: str):
         engine = GameEngine(session)
+        self.waiting_timers[session.chat_id].cancel()
         if engine.is_answer_correct(answer):
             if engine.is_already_answered(answer):
                 text = self._build_already_answered_message(session)
@@ -248,13 +274,10 @@ class GameManager:
         else:
             text = self._handle_wrong_answer(session)
 
-        engine.clear_active_player()
-        await self.session_manager.set_session(session)
+        await self._prepare_next_step(session)
         await self.tg.send_message(
             MessageReply(
                 chat_id=session.chat_id, text=text, reply_markup=ANSWER_KEYBOARD
             )
         )
-
-        if not engine.is_game_continued():
-            await self._stop_game(session)
+        await self._check_game_status(session)

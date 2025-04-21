@@ -4,7 +4,8 @@ from bot.core.fsm import State, StateGroups
 from shared.client.schemes.keyboard import InlineKeyboardMarkupSchema
 
 CALLBACK_DATA = "answer"
-WAITING_TIME = 20
+PLAYERS_WAITING_TIME = 20
+ANSWER_WAITING_TIME = 15
 MIN_PLAYERS = 2
 
 
