@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - shared_docker.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bot-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - bot-net
+
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - bot-net
+
+  poller:
+    image: jendox/kts-course-repository:poller
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+    networks:
+      - bot-net
+    env_file:
+      - shared_docker.env
+
+  web:
+    image: jendox/kts-course-repository:data-service
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - bot-net
+    env_file:
+      - shared_docker.env
+    ports:
+      - "80:8080"
+
+  bot:
+    image: jendox/kts-course-repository:bot
+    restart: unless-stopped
+    depends_on:
+      - poller
+      - web
+    networks:
+      - bot-net
+    env_file:
+      - shared_docker.env
+
+volumes:
+  rabbitmq_data:
+  redis_data:
+  postgres_data:
+
+networks:
+  bot-net:
+    driver: bridge

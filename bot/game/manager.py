@@ -1,15 +1,15 @@
 import asyncio
-from asyncio import Task
 from collections.abc import Awaitable, Callable
 from logging import getLogger
 
 from bot.game.constants import (
     ANSWER_KEYBOARD,
+    ANSWER_WAITING_TIME,
     CALLBACK_DATA,
-    START_MESSAGE,
     PLAYERS_WAITING_TIME,
+    START_MESSAGE,
     GameCommand,
-    GameState, ANSWER_WAITING_TIME,
+    GameState,
 )
 from bot.game.engine import GameEngine
 from bot.game.messages import Messages
@@ -30,7 +30,7 @@ class GameManager:
         self.tg = tg
         self.dsv_client = dsv
         self.session_manager = SessionManager(storage)
-        self.waiting_timers: dict[int, Task] = {}
+        self.waiting_timers: dict[int, asyncio.Task] = {}
 
         self.command_handlers: dict[
             GameCommand, Callable[[Message], Awaitable[None]]
@@ -81,7 +81,9 @@ class GameManager:
                 await self.tg.send_message(
                     MessageReply(
                         chat_id=chat_id,
-                        text=Messages.player_pressed_first(player.name, ANSWER_WAITING_TIME),
+                        text=Messages.player_pressed_first(
+                            player.name, ANSWER_WAITING_TIME
+                        ),
                     )
                 )
 

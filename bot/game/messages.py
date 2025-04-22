@@ -55,7 +55,10 @@ class Messages:
 
     @staticmethod
     def answer_time_run_out(username: str) -> str:
-        return f"❌ *Увы! Закончилось время для ответа.*\n" f"{username} выбывает из игры."
+        return (
+            f"❌ *Увы! Закончилось время для ответа.*\n"
+            f"{username} выбывает из игры."
+        )
 
     @staticmethod
     def not_enough_players() -> str:
