@@ -1,12 +1,12 @@
 import typing
 
 from data_service.quiz.views import (
-    GameSessionSaveView,
+    CreateQuestionView,
+    DeleteQuestionView,
     LastGameSessionView,
-    QuestionAddView,
-    QuestionDeleteView,
-    QuestionListView,
-    QuestionRandomView,
+    ListQuestionsView,
+    RandomQuestionView,
+    SaveGameSessionView,
 )
 
 if typing.TYPE_CHECKING:
@@ -14,9 +14,9 @@ if typing.TYPE_CHECKING:
 
 
 def setup_routes(app: "Application"):
-    app.router.add_view("/quiz.random_question", QuestionRandomView)
-    app.router.add_view("/quiz.list_questions", QuestionListView)
-    app.router.add_view("/quiz.add_question", QuestionAddView)
-    app.router.add_view("/quiz.delete_question", QuestionDeleteView)
-    app.router.add_view("/quiz.save_game", GameSessionSaveView)
+    app.router.add_view("/quiz.random_question", RandomQuestionView)
+    app.router.add_view("/quiz.list_questions", ListQuestionsView)
+    app.router.add_view("/quiz.add_question", CreateQuestionView)
+    app.router.add_view("/quiz.delete_question", DeleteQuestionView)
+    app.router.add_view("/quiz.save_game", SaveGameSessionView)
     app.router.add_view("/quiz.last_game", LastGameSessionView)

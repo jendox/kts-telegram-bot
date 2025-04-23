@@ -1,7 +1,7 @@
 from typing import Optional
 
 from aiohttp_session import Session
-from argon2 import PasswordHasher
+from argon2 import PasswordHasher, exceptions
 from sqlalchemy.orm import Mapped
 
 from data_service.admin.schemes import AdminSchema
@@ -20,7 +20,12 @@ class Admin(BaseModel):
     password: Mapped[str]
 
     def is_password_valid(self, password: str):
-        return PasswordHasher().verify(hash=self.password, password=password)
+        try:
+            return PasswordHasher().verify(
+                hash=self.password, password=password
+            )
+        except exceptions.VerifyMismatchError:
+            return False
 
     @staticmethod
     def hash_password(password: str) -> str:
